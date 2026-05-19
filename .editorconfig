@@ -12,7 +12,9 @@ insert_final_newline = true
 # C# files
 [*.cs]
 # Naming rules
+# Readonly fields: _PascalCase (underscore prefix + PascalCase)
 dotnet_naming_style.readonly_pascal_case.capitalization = pascal_case
+dotnet_naming_style.readonly_pascal_case.required_prefix = _
 dotnet_naming_rule.readonly_fields_pascal_case.symbols = readonly_fields
 dotnet_naming_rule.readonly_fields_pascal_case.style = readonly_pascal_case
 dotnet_naming_rule.readonly_fields_pascal_case.severity = suggestion
@@ -28,6 +30,14 @@ dotnet_naming_rule.abstract_class_names.style = abstract_class_base_suffix
 dotnet_naming_rule.abstract_class_names.severity = suggestion
 dotnet_naming_symbols.abstract_classes.applicable_kinds = class
 dotnet_naming_symbols.abstract_classes.required_modifiers = abstract
+
+# Constants: PascalCase
+dotnet_naming_style.constant_pascal_case.capitalization = pascal_case
+dotnet_naming_rule.constants_pascal_case.symbols = constants
+dotnet_naming_rule.constants_pascal_case.style = constant_pascal_case
+dotnet_naming_rule.constants_pascal_case.severity = suggestion
+dotnet_naming_symbols.constants.applicable_kinds = field, local
+dotnet_naming_symbols.constants.required_modifiers = const
 
 # Language features
 csharp_prefer_simple_using_statement = true:suggestion

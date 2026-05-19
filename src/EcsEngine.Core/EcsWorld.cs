@@ -5,46 +5,46 @@ namespace EcsEngine.Core;
 public sealed class EcsWorld
 {
     private int _nextEntityId = 1;
-    private readonly HashSet<int> _aliveEntityIds = [];
-    private readonly HashSet<int> _pendingDeletionEntityIds = [];
-    private readonly Dictionary<Type, IComponentStore> _componentStores = [];
-    private readonly List<IComponentMutation> _pendingComponentMutations = [];
-    private readonly Dictionary<Type, IList> _nextTickEvents = [];
-    private readonly Dictionary<Type, IList> _currentTickEvents = [];
+    private readonly HashSet<int> _AliveEntityIds = [];
+    private readonly HashSet<int> _PendingDeletionEntityIds = [];
+    private readonly Dictionary<Type, IComponentStore> _ComponentStores = [];
+    private readonly List<IComponentMutation> _PendingComponentMutations = [];
+    private readonly Dictionary<Type, IList> _NextTickEvents = [];
+    private readonly Dictionary<Type, IList> _CurrentTickEvents = [];
 
     public int Tick { get; private set; }
 
     public EntityId CreateEntity()
     {
         var entityId = new EntityId(_nextEntityId++);
-        _aliveEntityIds.Add(entityId.Value);
+        _AliveEntityIds.Add(entityId.Value);
         return entityId;
     }
 
-    public bool Exists(EntityId entityId) => _aliveEntityIds.Contains(entityId.Value);
+    public bool Exists(EntityId entityId) => _AliveEntityIds.Contains(entityId.Value);
 
-    public bool IsMarkedForDeletion(EntityId entityId) => _pendingDeletionEntityIds.Contains(entityId.Value);
+    public bool IsMarkedForDeletion(EntityId entityId) => _PendingDeletionEntityIds.Contains(entityId.Value);
 
     public bool CanSchedule(EntityId entityId) => Exists(entityId) && !IsMarkedForDeletion(entityId);
 
     public void MarkForDeletion(EntityId entityId)
     {
         EnsureEntityExists(entityId);
-        _pendingDeletionEntityIds.Add(entityId.Value);
+        _PendingDeletionEntityIds.Add(entityId.Value);
     }
 
     public void QueueAddComponent<T>(EntityId entityId, in T component)
         where T : struct, IEcsComponent
     {
         EnsureEntityCanMutate(entityId);
-        _pendingComponentMutations.Add(new AddComponentMutation<T>(entityId, component));
+        _PendingComponentMutations.Add(new AddComponentMutation<T>(entityId, component));
     }
 
     public void QueueRemoveComponent<T>(EntityId entityId)
         where T : struct, IEcsComponent
     {
         EnsureEntityCanMutate(entityId);
-        _pendingComponentMutations.Add(new RemoveComponentMutation<T>(entityId));
+        _PendingComponentMutations.Add(new RemoveComponentMutation<T>(entityId));
     }
 
     public bool TryGetComponent<T>(EntityId entityId, out T component)
@@ -52,7 +52,7 @@ public sealed class EcsWorld
     {
         component = default;
 
-        if (!Exists(entityId) || !_componentStores.TryGetValue(typeof(T), out var store))
+        if (!Exists(entityId) || !_ComponentStores.TryGetValue(typeof(T), out var store))
         {
             return false;
         }
@@ -64,10 +64,10 @@ public sealed class EcsWorld
         where T : struct, IEcsEvent
     {
         var type = typeof(T);
-        if (!_nextTickEvents.TryGetValue(type, out var list))
+        if (!_NextTickEvents.TryGetValue(type, out var list))
         {
             list = new List<T>();
-            _nextTickEvents[type] = list;
+            _NextTickEvents[type] = list;
         }
 
         ((List<T>)list).Add(@event);
@@ -76,7 +76,7 @@ public sealed class EcsWorld
     public IReadOnlyList<T> GetCurrentTickEvents<T>()
         where T : struct, IEcsEvent
     {
-        if (_currentTickEvents.TryGetValue(typeof(T), out var list))
+        if (_CurrentTickEvents.TryGetValue(typeof(T), out var list))
         {
             return (List<T>)list;
         }
@@ -87,49 +87,49 @@ public sealed class EcsWorld
     public void AdvanceTick()
     {
         Tick++;
-        _currentTickEvents.Clear();
+        _CurrentTickEvents.Clear();
 
-        foreach (var (type, eventsForType) in _nextTickEvents)
+        foreach (var (type, eventsForType) in _NextTickEvents)
         {
-            _currentTickEvents[type] = eventsForType;
+            _CurrentTickEvents[type] = eventsForType;
         }
 
-        _nextTickEvents.Clear();
+        _NextTickEvents.Clear();
     }
 
     public void ApplySafePoint()
     {
-        foreach (var mutation in _pendingComponentMutations)
+        foreach (var mutation in _PendingComponentMutations)
         {
             mutation.Apply(this);
         }
 
-        _pendingComponentMutations.Clear();
+        _PendingComponentMutations.Clear();
 
-        foreach (var entityIdValue in _pendingDeletionEntityIds)
+        foreach (var entityIdValue in _PendingDeletionEntityIds)
         {
-            _aliveEntityIds.Remove(entityIdValue);
+            _AliveEntityIds.Remove(entityIdValue);
 
-            foreach (var store in _componentStores.Values)
+            foreach (var store in _ComponentStores.Values)
             {
                 store.Remove(new EntityId(entityIdValue));
             }
         }
 
-        _pendingDeletionEntityIds.Clear();
+        _PendingDeletionEntityIds.Clear();
     }
 
     private ComponentStore<T> GetOrCreateStore<T>()
         where T : struct, IEcsComponent
     {
         var type = typeof(T);
-        if (_componentStores.TryGetValue(type, out var store))
+        if (_ComponentStores.TryGetValue(type, out var store))
         {
             return (ComponentStore<T>)store;
         }
 
         var typedStore = new ComponentStore<T>();
-        _componentStores[type] = typedStore;
+        _ComponentStores[type] = typedStore;
         return typedStore;
     }
 
@@ -141,13 +141,13 @@ public sealed class EcsWorld
     private sealed class ComponentStore<T> : IComponentStore
         where T : struct, IEcsComponent
     {
-        private readonly Dictionary<int, T> _componentsByEntityId = [];
+        private readonly Dictionary<int, T> _ComponentsByEntityId = [];
 
-        public void Set(EntityId entityId, in T component) => _componentsByEntityId[entityId.Value] = component;
+        public void Set(EntityId entityId, in T component) => _ComponentsByEntityId[entityId.Value] = component;
 
-        public bool TryGet(EntityId entityId, out T component) => _componentsByEntityId.TryGetValue(entityId.Value, out component);
+        public bool TryGet(EntityId entityId, out T component) => _ComponentsByEntityId.TryGetValue(entityId.Value, out component);
 
-        public void Remove(EntityId entityId) => _componentsByEntityId.Remove(entityId.Value);
+        public void Remove(EntityId entityId) => _ComponentsByEntityId.Remove(entityId.Value);
     }
 
     private interface IComponentMutation
