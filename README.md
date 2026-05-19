@@ -46,3 +46,6 @@ Builds use a repository-level `artifacts` directory (configured in `Directory.Bu
 - Decisions: `docs/concepts/DECISIONS.md`
 - Reports: `docs/reports/`
 - Implementation plan: `docs/implementation-plan.md`
+
+## Note
+This project is also a playground for testing out ECS, source generators, AOT, and coding agents. That means, don't take it too seriously.
