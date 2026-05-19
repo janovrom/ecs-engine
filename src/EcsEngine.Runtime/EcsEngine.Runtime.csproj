@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\EcsEngine.Core\EcsEngine.Core.csproj" />
+    <ProjectReference Include="..\EcsEngine.Simulation\EcsEngine.Simulation.csproj" />
+    <ProjectReference Include="..\EcsEngine.Rendering\EcsEngine.Rendering.csproj" />
+    <ProjectReference Include="..\EcsEngine.Transport\EcsEngine.Transport.csproj" />
+    <ProjectReference Include="..\EcsEngine.Replay\EcsEngine.Replay.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+</Project>

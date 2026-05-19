@@ -1,0 +1,18 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/EcsEngine.Core/EcsEngine.Core.csproj" />
+    <Project Path="src/EcsEngine.Rendering/EcsEngine.Rendering.csproj" />
+    <Project Path="src/EcsEngine.Replay/EcsEngine.Replay.csproj" />
+    <Project Path="src/EcsEngine.Runtime/EcsEngine.Runtime.csproj" />
+    <Project Path="src/EcsEngine.Simulation/EcsEngine.Simulation.csproj" />
+    <Project Path="src/EcsEngine.SourceGen/EcsEngine.SourceGen.csproj" />
+    <Project Path="src/EcsEngine.Transport/EcsEngine.Transport.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/EcsEngine.Core.Tests/EcsEngine.Core.Tests.csproj" />
+    <Project Path="tests/EcsEngine.Integration.Tests/EcsEngine.Integration.Tests.csproj" />
+  </Folder>
+  <Folder Name="/tools/">
+    <Project Path="tools/EcsEngine.SnapshotInspector/EcsEngine.SnapshotInspector.csproj" />
+  </Folder>
+</Solution>
