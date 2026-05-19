@@ -30,14 +30,14 @@ jobs:
         run: dotnet tool restore
 
       - name: Generate SBOM
-        run: dotnet cyclonedx EcsEngine.slnx --output ./artifacts/sbom.spdx.json --json
+        run: dotnet tool run dotnet-CycloneDX -- EcsEngine.slnx --output ./artifacts/sbom
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
-            ./artifacts/sbom.spdx.json
+            ./artifacts/sbom/bom.xml
           draft: false
           prerelease: false
         env:
@@ -50,6 +50,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./artifacts/sbom.spdx.json
-          asset_name: sbom.spdx.json
+          asset_path: ./artifacts/sbom/bom.xml
+          asset_name: sbom.xml
           asset_content_type: application/json
