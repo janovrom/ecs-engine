@@ -9,6 +9,7 @@
     <Project Path="src/EcsEngine.Transport/EcsEngine.Transport.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/EcsEngine.Benchmarks/EcsEngine.Benchmarks.csproj" />
     <Project Path="tests/EcsEngine.Core.Tests/EcsEngine.Core.Tests.csproj" />
     <Project Path="tests/EcsEngine.Integration.Tests/EcsEngine.Integration.Tests.csproj" />
   </Folder>

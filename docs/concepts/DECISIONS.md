@@ -47,6 +47,12 @@ Status: Final
 - D-040: Archetype/component-set changes are applied only at safe tick points.
 - D-041: ECS inspection/tooling support is available in both debug and release; release builds must not rely on runtime reflection.
 
+- D-042: Storage selection is declared via `[ArchetypeStorage]` or `[SparseStorage]` attribute on the component struct. Undecorated components default to sparse-set. Source gen abstracts routing; users are oblivious to the storage backend.
+- D-043: `[ArchetypeStorage(ChunkSizeBytes = N)]` controls chunk memory budget per component type; default is 16 KB. For a multi-component archetype, chunk capacity = min(ChunkSizeBytes across component types in archetype) / sum(SizeOf(T) for each T in archetype).
+- D-044: Query parameter model: `IRequire<T>` maps to `in T` (read-only), `IOutput<T>` maps to `out T` (write replacement), `IReject<T>` is a filter with no parameter. M3 ships a permanent `world.QueryEach<T1,...>(callback)` API that source gen calls internally in M4 but is also directly usable.
+- D-045: Query caching is lazy — matched-archetype lists are built on first call and invalidated when a new archetype is created. `world.PreloadQuery<T1,...>()` warms the cache eagerly to avoid first-call latency on the hot path.
+- D-046: Benchmarks live in `tests/EcsEngine.Benchmarks` using BenchmarkDotNet. Invoked via `dotnet run -c Release`; not part of `dotnet test`.
+
 ## Deferred Scope
 
 - S-001: Additional area-editing tools beyond lasso are acknowledged and deferred for later design.

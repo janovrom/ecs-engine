@@ -1,4 +1,6 @@
 using System.Collections;
+using EcsEngine.Core.Query;
+using EcsEngine.Core.Storage;
 
 namespace EcsEngine.Core;
 
@@ -7,16 +9,23 @@ public sealed class EcsWorld
     private int _nextEntityId = 1;
     private readonly HashSet<int> _AliveEntityIds = [];
     private readonly HashSet<int> _PendingDeletionEntityIds = [];
-    private readonly Dictionary<Type, IComponentStore> _ComponentStores = [];
+    private readonly ArchetypeRegistry _ArchetypeRegistry = new();
+    private readonly Dictionary<Type, ISparseStore> _SparseStores = [];
     private readonly List<IComponentMutation> _PendingComponentMutations = [];
     private readonly Dictionary<Type, IList> _NextTickEvents = [];
     private readonly Dictionary<Type, IList> _CurrentTickEvents = [];
+    private readonly QueryRegistry _QueryRegistry;
 
     public int Tick { get; private set; }
 
+    public EcsWorld()
+    {
+        _QueryRegistry = new QueryRegistry(_ArchetypeRegistry);
+    }
+
     public EntityId CreateEntity()
     {
-        var entityId = new EntityId(_nextEntityId++);
+        EntityId entityId = new(_nextEntityId++);
         _AliveEntityIds.Add(entityId.Value);
         return entityId;
     }
@@ -37,50 +46,61 @@ public sealed class EcsWorld
         where T : struct, IEcsComponent
     {
         EnsureEntityCanMutate(entityId);
-        _PendingComponentMutations.Add(new AddComponentMutation<T>(entityId, component));
+        ComponentTypeInfo info = ComponentTypeRegistry.GetOrRegister<T>();
+        if (info.StorageKind == StorageKind.Archetype)
+            _PendingComponentMutations.Add(new ArchetypeAddMutation<T>(entityId, component));
+        else
+            _PendingComponentMutations.Add(new SparseAddMutation<T>(entityId, component));
     }
 
     public void QueueRemoveComponent<T>(EntityId entityId)
         where T : struct, IEcsComponent
     {
         EnsureEntityCanMutate(entityId);
-        _PendingComponentMutations.Add(new RemoveComponentMutation<T>(entityId));
+        ComponentTypeInfo info = ComponentTypeRegistry.GetOrRegister<T>();
+        if (info.StorageKind == StorageKind.Archetype)
+            _PendingComponentMutations.Add(new ArchetypeRemoveMutation<T>(entityId));
+        else
+            _PendingComponentMutations.Add(new SparseRemoveMutation<T>(entityId));
     }
 
     public bool TryGetComponent<T>(EntityId entityId, out T component)
         where T : struct, IEcsComponent
     {
         component = default;
+        if (!Exists(entityId)) return false;
 
-        if (!Exists(entityId) || !_ComponentStores.TryGetValue(typeof(T), out var store))
+        ComponentTypeInfo info = ComponentTypeRegistry.GetOrRegister<T>();
+        if (info.StorageKind == StorageKind.Archetype)
         {
-            return false;
+            EntityLocation loc = _ArchetypeRegistry.GetLocation(entityId);
+            if (!loc.IsValid || !loc.Chunk!.HasColumn(typeof(T))) return false;
+            component = loc.Chunk.GetColumn<T>()[loc.SlotIndex];
+            return true;
         }
 
-        return ((ComponentStore<T>)store).TryGet(entityId, out component);
+        if (_SparseStores.TryGetValue(typeof(T), out ISparseStore? store))
+            return ((SparseSetStore<T>)store).TryGet(entityId, out component);
+        return false;
     }
 
     public void QueueEvent<T>(in T @event)
         where T : struct, IEcsEvent
     {
-        var type = typeof(T);
-        if (!_NextTickEvents.TryGetValue(type, out var list))
+        Type type = typeof(T);
+        if (!_NextTickEvents.TryGetValue(type, out IList? list))
         {
             list = new List<T>();
             _NextTickEvents[type] = list;
         }
-
         ((List<T>)list).Add(@event);
     }
 
     public IReadOnlyList<T> GetCurrentTickEvents<T>()
         where T : struct, IEcsEvent
     {
-        if (_CurrentTickEvents.TryGetValue(typeof(T), out var list))
-        {
+        if (_CurrentTickEvents.TryGetValue(typeof(T), out IList? list))
             return (List<T>)list;
-        }
-
         return [];
     }
 
@@ -88,99 +108,305 @@ public sealed class EcsWorld
     {
         Tick++;
         _CurrentTickEvents.Clear();
-
-        foreach (var (type, eventsForType) in _NextTickEvents)
-        {
+        foreach ((Type type, IList eventsForType) in _NextTickEvents)
             _CurrentTickEvents[type] = eventsForType;
-        }
-
         _NextTickEvents.Clear();
     }
 
     public void ApplySafePoint()
     {
-        foreach (var mutation in _PendingComponentMutations)
-        {
+        foreach (IComponentMutation mutation in _PendingComponentMutations)
             mutation.Apply(this);
-        }
-
         _PendingComponentMutations.Clear();
 
-        foreach (var entityIdValue in _PendingDeletionEntityIds)
+        foreach (int entityIdValue in _PendingDeletionEntityIds)
         {
+            EntityId entityId = new(entityIdValue);
+            _ArchetypeRegistry.RemoveEntity(entityId);
+            foreach (ISparseStore store in _SparseStores.Values)
+                store.Remove(entityId);
             _AliveEntityIds.Remove(entityIdValue);
-
-            foreach (var store in _ComponentStores.Values)
-            {
-                store.Remove(new EntityId(entityIdValue));
-            }
         }
-
         _PendingDeletionEntityIds.Clear();
     }
 
-    private ComponentStore<T> GetOrCreateStore<T>()
+    // --- Query API ---
+
+    public void QueryEach<T1>(QueryCallback<T1> callback)
+        where T1 : struct, IEcsComponent
+    {
+        ComponentTypeInfo info1 = ComponentTypeRegistry.GetOrRegister<T1>();
+        if (info1.StorageKind == StorageKind.Archetype)
+        {
+            QueryKey key = QueryKey.For<T1>();
+            foreach (Archetype archetype in _QueryRegistry.GetMatchingArchetypes(key))
+            {
+                foreach (ArchetypeChunk chunk in archetype.Chunks)
+                {
+                    Span<EntityId> entities = chunk.EntityIds;
+                    ComponentColumn<T1> col1 = chunk.GetColumn<T1>();
+                    for (int i = 0; i < chunk.Count; i++)
+                        callback(entities[i], in col1[i]);
+                }
+            }
+        }
+        else
+        {
+            if (!_SparseStores.TryGetValue(typeof(T1), out ISparseStore? store)) return;
+            SparseSetStore<T1> typedStore = (SparseSetStore<T1>)store;
+            Span<int> entityIds = typedStore.DenseEntityIds;
+            Span<T1> data = typedStore.DenseData;
+            for (int i = 0; i < typedStore.Count; i++)
+                callback(new EntityId(entityIds[i]), in data[i]);
+        }
+    }
+
+    public void QueryEach<T1, T2>(QueryCallback<T1, T2> callback)
+        where T1 : struct, IEcsComponent
+        where T2 : struct, IEcsComponent
+    {
+        ComponentTypeInfo info1 = ComponentTypeRegistry.GetOrRegister<T1>();
+        ComponentTypeInfo info2 = ComponentTypeRegistry.GetOrRegister<T2>();
+
+        if (info1.StorageKind == StorageKind.Archetype && info2.StorageKind == StorageKind.Archetype)
+        {
+            QueryKey key = QueryKey.For<T1, T2>();
+            foreach (Archetype archetype in _QueryRegistry.GetMatchingArchetypes(key))
+            {
+                foreach (ArchetypeChunk chunk in archetype.Chunks)
+                {
+                    Span<EntityId> entities = chunk.EntityIds;
+                    ComponentColumn<T1> col1 = chunk.GetColumn<T1>();
+                    ComponentColumn<T2> col2 = chunk.GetColumn<T2>();
+                    for (int i = 0; i < chunk.Count; i++)
+                        callback(entities[i], in col1[i], in col2[i]);
+                }
+            }
+        }
+        else if (info1.StorageKind == StorageKind.Archetype)
+        {
+            if (!_SparseStores.TryGetValue(typeof(T2), out ISparseStore? store2)) return;
+            SparseSetStore<T2> typedStore2 = (SparseSetStore<T2>)store2;
+            QueryKey key = QueryKey.For<T1>();
+            foreach (Archetype archetype in _QueryRegistry.GetMatchingArchetypes(key))
+            {
+                foreach (ArchetypeChunk chunk in archetype.Chunks)
+                {
+                    Span<EntityId> entities = chunk.EntityIds;
+                    ComponentColumn<T1> col1 = chunk.GetColumn<T1>();
+                    for (int i = 0; i < chunk.Count; i++)
+                    {
+                        if (typedStore2.TryGet(entities[i], out T2 c2))
+                            callback(entities[i], in col1[i], in c2);
+                    }
+                }
+            }
+        }
+        else if (info2.StorageKind == StorageKind.Archetype)
+        {
+            if (!_SparseStores.TryGetValue(typeof(T1), out ISparseStore? store1)) return;
+            SparseSetStore<T1> typedStore1 = (SparseSetStore<T1>)store1;
+            QueryKey key = QueryKey.For<T2>();
+            foreach (Archetype archetype in _QueryRegistry.GetMatchingArchetypes(key))
+            {
+                foreach (ArchetypeChunk chunk in archetype.Chunks)
+                {
+                    Span<EntityId> entities = chunk.EntityIds;
+                    ComponentColumn<T2> col2 = chunk.GetColumn<T2>();
+                    for (int i = 0; i < chunk.Count; i++)
+                    {
+                        if (typedStore1.TryGet(entities[i], out T1 c1))
+                            callback(entities[i], in c1, in col2[i]);
+                    }
+                }
+            }
+        }
+        else
+        {
+            if (!_SparseStores.TryGetValue(typeof(T1), out ISparseStore? store1)) return;
+            if (!_SparseStores.TryGetValue(typeof(T2), out ISparseStore? store2)) return;
+            SparseSetStore<T1> typedStore1 = (SparseSetStore<T1>)store1;
+            SparseSetStore<T2> typedStore2 = (SparseSetStore<T2>)store2;
+            Span<int> entityIds = typedStore1.DenseEntityIds;
+            Span<T1> data1 = typedStore1.DenseData;
+            for (int i = 0; i < typedStore1.Count; i++)
+            {
+                EntityId entity = new(entityIds[i]);
+                if (typedStore2.TryGet(entity, out T2 c2))
+                    callback(entity, in data1[i], in c2);
+            }
+        }
+    }
+
+    public void QueryEach<T1, T2, T3>(QueryCallback<T1, T2, T3> callback)
+        where T1 : struct, IEcsComponent
+        where T2 : struct, IEcsComponent
+        where T3 : struct, IEcsComponent
+    {
+        ComponentTypeInfo info1 = ComponentTypeRegistry.GetOrRegister<T1>();
+        ComponentTypeInfo info2 = ComponentTypeRegistry.GetOrRegister<T2>();
+        ComponentTypeInfo info3 = ComponentTypeRegistry.GetOrRegister<T3>();
+
+        if (info1.StorageKind == StorageKind.Archetype
+            && info2.StorageKind == StorageKind.Archetype
+            && info3.StorageKind == StorageKind.Archetype)
+        {
+            QueryKey key = QueryKey.For<T1, T2, T3>();
+            foreach (Archetype archetype in _QueryRegistry.GetMatchingArchetypes(key))
+            {
+                foreach (ArchetypeChunk chunk in archetype.Chunks)
+                {
+                    Span<EntityId> entities = chunk.EntityIds;
+                    ComponentColumn<T1> col1 = chunk.GetColumn<T1>();
+                    ComponentColumn<T2> col2 = chunk.GetColumn<T2>();
+                    ComponentColumn<T3> col3 = chunk.GetColumn<T3>();
+                    for (int i = 0; i < chunk.Count; i++)
+                        callback(entities[i], in col1[i], in col2[i], in col3[i]);
+                }
+            }
+        }
+        else if (info1.StorageKind == StorageKind.Archetype)
+        {
+            QueryKey key = QueryKey.For<T1>();
+            foreach (Archetype archetype in _QueryRegistry.GetMatchingArchetypes(key))
+            {
+                foreach (ArchetypeChunk chunk in archetype.Chunks)
+                {
+                    Span<EntityId> entities = chunk.EntityIds;
+                    ComponentColumn<T1> col1 = chunk.GetColumn<T1>();
+                    for (int i = 0; i < chunk.Count; i++)
+                    {
+                        EntityId entity = entities[i];
+                        if (TryGetComponent<T2>(entity, out T2 c2) && TryGetComponent<T3>(entity, out T3 c3))
+                            callback(entity, in col1[i], in c2, in c3);
+                    }
+                }
+            }
+        }
+        else
+        {
+            if (!_SparseStores.TryGetValue(typeof(T1), out ISparseStore? store1)) return;
+            SparseSetStore<T1> typedStore1 = (SparseSetStore<T1>)store1;
+            Span<int> entityIds = typedStore1.DenseEntityIds;
+            Span<T1> data1 = typedStore1.DenseData;
+            for (int i = 0; i < typedStore1.Count; i++)
+            {
+                EntityId entity = new(entityIds[i]);
+                if (TryGetComponent<T2>(entity, out T2 c2) && TryGetComponent<T3>(entity, out T3 c3))
+                    callback(entity, in data1[i], in c2, in c3);
+            }
+        }
+    }
+
+    public void PreloadQuery<T1>()
+        where T1 : struct, IEcsComponent
+        => _QueryRegistry.Preload(QueryKey.For<T1>());
+
+    public void PreloadQuery<T1, T2>()
+        where T1 : struct, IEcsComponent
+        where T2 : struct, IEcsComponent
+        => _QueryRegistry.Preload(QueryKey.For<T1, T2>());
+
+    public void PreloadQuery<T1, T2, T3>()
+        where T1 : struct, IEcsComponent
+        where T2 : struct, IEcsComponent
+        where T3 : struct, IEcsComponent
+        => _QueryRegistry.Preload(QueryKey.For<T1, T2, T3>());
+
+    // --- Private mutation application ---
+
+    private void ApplyArchetypeAdd<T>(EntityId entityId, in T component)
         where T : struct, IEcsComponent
     {
-        var type = typeof(T);
-        if (_ComponentStores.TryGetValue(type, out var store))
+        ArchetypeKey currentKey = _ArchetypeRegistry.GetCurrentKey(entityId);
+        ArchetypeKey newKey = currentKey.Add(typeof(T));
+
+        if (newKey.Equals(currentKey))
         {
-            return (ComponentStore<T>)store;
+            EntityLocation loc = _ArchetypeRegistry.GetLocation(entityId);
+            if (loc.IsValid) loc.Chunk!.GetColumn<T>()[loc.SlotIndex] = component;
+            return;
         }
 
-        var typedStore = new ComponentStore<T>();
-        _ComponentStores[type] = typedStore;
-        return typedStore;
+        EntityLocation newLocation = _ArchetypeRegistry.MoveEntity(entityId, newKey);
+        newLocation.Chunk!.GetColumn<T>()[newLocation.SlotIndex] = component;
     }
 
-    private interface IComponentStore
-    {
-        void Remove(EntityId entityId);
-    }
-
-    private sealed class ComponentStore<T> : IComponentStore
+    private void ApplyArchetypeRemove<T>(EntityId entityId)
         where T : struct, IEcsComponent
     {
-        private readonly Dictionary<int, T> _ComponentsByEntityId = [];
-
-        public void Set(EntityId entityId, in T component) => _ComponentsByEntityId[entityId.Value] = component;
-
-        public bool TryGet(EntityId entityId, out T component) => _ComponentsByEntityId.TryGetValue(entityId.Value, out component);
-
-        public void Remove(EntityId entityId) => _ComponentsByEntityId.Remove(entityId.Value);
+        ArchetypeKey currentKey = _ArchetypeRegistry.GetCurrentKey(entityId);
+        if (!currentKey.Contains(typeof(T))) return;
+        ArchetypeKey newKey = currentKey.Remove(typeof(T));
+        _ArchetypeRegistry.MoveEntity(entityId, newKey);
     }
+
+    private void ApplySparseAdd<T>(EntityId entityId, in T component)
+        where T : struct, IEcsComponent
+        => GetOrCreateSparseStore<T>().Set(entityId, component);
+
+    private void ApplySparseRemove<T>(EntityId entityId)
+        where T : struct, IEcsComponent
+    {
+        if (_SparseStores.TryGetValue(typeof(T), out ISparseStore? store))
+            ((SparseSetStore<T>)store).Remove(entityId);
+    }
+
+    private SparseSetStore<T> GetOrCreateSparseStore<T>()
+        where T : struct, IEcsComponent
+    {
+        Type type = typeof(T);
+        if (!_SparseStores.TryGetValue(type, out ISparseStore? store))
+        {
+            store = new SparseSetStore<T>();
+            _SparseStores[type] = store;
+        }
+        return (SparseSetStore<T>)store;
+    }
+
+    // --- Private mutation types ---
 
     private interface IComponentMutation
     {
         void Apply(EcsWorld world);
     }
 
-    private readonly record struct AddComponentMutation<T>(EntityId EntityId, T Component) : IComponentMutation
+    private readonly record struct ArchetypeAddMutation<T>(EntityId EntityId, T Component) : IComponentMutation
         where T : struct, IEcsComponent
     {
-        public void Apply(EcsWorld world) => world.GetOrCreateStore<T>().Set(EntityId, Component);
+        public void Apply(EcsWorld world) { T c = Component; world.ApplyArchetypeAdd<T>(EntityId, in c); }
     }
 
-    private readonly record struct RemoveComponentMutation<T>(EntityId EntityId) : IComponentMutation
+    private readonly record struct ArchetypeRemoveMutation<T>(EntityId EntityId) : IComponentMutation
         where T : struct, IEcsComponent
     {
-        public void Apply(EcsWorld world) => world.GetOrCreateStore<T>().Remove(EntityId);
+        public void Apply(EcsWorld world) => world.ApplyArchetypeRemove<T>(EntityId);
     }
+
+    private readonly record struct SparseAddMutation<T>(EntityId EntityId, T Component) : IComponentMutation
+        where T : struct, IEcsComponent
+    {
+        public void Apply(EcsWorld world) { T c = Component; world.ApplySparseAdd<T>(EntityId, in c); }
+    }
+
+    private readonly record struct SparseRemoveMutation<T>(EntityId EntityId) : IComponentMutation
+        where T : struct, IEcsComponent
+    {
+        public void Apply(EcsWorld world) => world.ApplySparseRemove<T>(EntityId);
+    }
+
+    // --- Guards ---
 
     private void EnsureEntityCanMutate(EntityId entityId)
     {
         EnsureEntityExists(entityId);
         if (IsMarkedForDeletion(entityId))
-        {
             throw new InvalidOperationException($"{entityId} is marked for deletion and cannot accept new mutations.");
-        }
     }
 
     private void EnsureEntityExists(EntityId entityId)
     {
         if (!Exists(entityId))
-        {
             throw new InvalidOperationException($"{entityId} does not exist.");
-        }
     }
 }
