@@ -12,15 +12,24 @@ insert_final_newline = true
 # C# files
 [*.cs]
 # Naming rules
-# Readonly fields: _PascalCase (underscore prefix + PascalCase)
+# Private/protected/internal readonly fields: _PascalCase (underscore prefix + PascalCase)
 dotnet_naming_style.readonly_pascal_case.capitalization = pascal_case
 dotnet_naming_style.readonly_pascal_case.required_prefix = _
 dotnet_naming_rule.readonly_fields_pascal_case.symbols = readonly_fields
 dotnet_naming_rule.readonly_fields_pascal_case.style = readonly_pascal_case
 dotnet_naming_rule.readonly_fields_pascal_case.severity = suggestion
 dotnet_naming_symbols.readonly_fields.applicable_kinds = field
-dotnet_naming_symbols.readonly_fields.applicable_accessibilities = *
+dotnet_naming_symbols.readonly_fields.applicable_accessibilities = private, protected, internal, protected_internal, private_protected
 dotnet_naming_symbols.readonly_fields.required_modifiers = readonly
+
+# Public readonly fields and properties: PascalCase (no prefix)
+dotnet_naming_style.pure_pascal_case.capitalization = pascal_case
+dotnet_naming_rule.public_readonly_pascal_case.symbols = public_readonly
+dotnet_naming_rule.public_readonly_pascal_case.style = pure_pascal_case
+dotnet_naming_rule.public_readonly_pascal_case.severity = suggestion
+dotnet_naming_symbols.public_readonly.applicable_kinds = field, property
+dotnet_naming_symbols.public_readonly.applicable_accessibilities = public
+dotnet_naming_symbols.public_readonly.required_modifiers = readonly
 
 # Abstract class naming
 dotnet_naming_style.abstract_class_base_suffix.capitalization = pascal_case

@@ -324,7 +324,7 @@ public sealed class EcsWorld
         if (newKey.Equals(currentKey))
         {
             EntityLocation loc = _ArchetypeRegistry.GetLocation(entityId);
-            if (loc.IsValid) loc.Chunk!.GetColumn<T>()[loc.SlotIndex] = component;
+            if (loc.IsValid) loc.Chunk.GetColumn<T>()[loc.SlotIndex] = component;
             return;
         }
 

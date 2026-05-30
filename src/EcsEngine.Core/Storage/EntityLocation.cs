@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace EcsEngine.Core.Storage;
 
 internal readonly struct EntityLocation
@@ -13,5 +15,6 @@ internal readonly struct EntityLocation
         SlotIndex = slotIndex;
     }
 
+    [MemberNotNullWhen(true, nameof(Chunk))]
     public bool IsValid => Chunk is not null;
 }

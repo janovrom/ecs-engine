@@ -15,7 +15,7 @@ internal sealed class ArchetypeRegistry
     public ArchetypeKey GetCurrentKey(EntityId entity)
     {
         EntityLocation loc = GetLocation(entity);
-        return loc.IsValid ? loc.Chunk!.Owner.Key : ArchetypeKey.Empty;
+        return loc.IsValid ? loc.Chunk.Owner.Key : ArchetypeKey.Empty;
     }
 
     // Moves entity to newKey, copying shared components from its current location.
@@ -23,7 +23,7 @@ internal sealed class ArchetypeRegistry
     public EntityLocation MoveEntity(EntityId entity, ArchetypeKey newKey)
     {
         EntityLocation oldLocation = GetLocation(entity);
-        ArchetypeKey oldKey = oldLocation.IsValid ? oldLocation.Chunk!.Owner.Key : ArchetypeKey.Empty;
+        ArchetypeKey oldKey = oldLocation.IsValid ? oldLocation.Chunk.Owner.Key : ArchetypeKey.Empty;
 
         if (newKey.Equals(oldKey))
             return oldLocation;
@@ -41,7 +41,7 @@ internal sealed class ArchetypeRegistry
 
         if (oldLocation.IsValid)
         {
-            ArchetypeChunk oldChunk = oldLocation.Chunk!;
+            ArchetypeChunk oldChunk = oldLocation.Chunk;
             foreach (Type type in newArchetype.Key.ComponentTypes)
             {
                 if (oldChunk.HasColumn(type))
@@ -89,7 +89,7 @@ internal sealed class ArchetypeRegistry
 
         foreach (Type type in key.ComponentTypes)
         {
-            if (ComponentTypeRegistry.TryGet(type, out ComponentTypeInfo info))
+            if (ComponentTypeRegistry.TryGet(type, out ComponentTypeInfo? info))
             {
                 factories[type] = info.ColumnFactory;
                 chunkSizeBytes = Math.Min(chunkSizeBytes, info.ChunkSizeBytes);

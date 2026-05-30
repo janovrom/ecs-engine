@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
@@ -50,6 +51,6 @@ internal static class ComponentTypeRegistry
         return info;
     }
 
-    public static bool TryGet(Type type, out ComponentTypeInfo info)
-        => _Registry.TryGetValue(type, out info!);
+    public static bool TryGet(Type type, [NotNullWhen(true)] out ComponentTypeInfo? info)
+        => _Registry.TryGetValue(type, out info);
 }
