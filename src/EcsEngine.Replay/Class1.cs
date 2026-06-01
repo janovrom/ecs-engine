@@ -1,6 +1,2 @@
-﻿namespace EcsEngine.Replay;
+﻿// This file is intentionally empty. Implementation is in the files below.
 
-public class Class1
-{
-
-}

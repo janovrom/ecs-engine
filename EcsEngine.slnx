@@ -12,6 +12,7 @@
     <Project Path="tests/EcsEngine.Benchmarks/EcsEngine.Benchmarks.csproj" />
     <Project Path="tests/EcsEngine.Core.Tests/EcsEngine.Core.Tests.csproj" />
     <Project Path="tests/EcsEngine.Integration.Tests/EcsEngine.Integration.Tests.csproj" />
+    <Project Path="tests/EcsEngine.Replay.Tests/EcsEngine.Replay.Tests.csproj" />
   </Folder>
   <Folder Name="/tools/">
     <Project Path="tools/EcsEngine.SnapshotInspector/EcsEngine.SnapshotInspector.csproj" />

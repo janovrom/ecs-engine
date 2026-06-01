@@ -60,6 +60,13 @@ Status: Final
 - D-051: `SystemExecutor.Run(EcsWorld)` is the single execution entry point per D-033. M4 execution is sequential. Parallel batching of independent systems is deferred to M5.
 - D-052: Topological sort order is deterministic across runs: when multiple systems have no mutual ordering constraint, they are ordered by `Type.FullName` ascending.
 
+- D-053: Op-log operations implement `IWorldOperation { void Apply(EcsWorld world); void ApplyToScheduler(TickScheduler? scheduler) { } }`. The default `ApplyToScheduler` is a no-op; only `SetTickIntervalOperation` overrides it. Each `EcsWorld` public mutating method records the equivalent operation when an `OpLog` is attached via `AttachOpLog(OpLog)`.
+- D-054: `EcsWorld` exposes `public IReadOnlySet<int> AliveEntityIds` for enumeration. Internal helpers `CreateEntityWithId(int)` and `SetTick(int)` enable replay and snapshot restore without breaking the public API. Both are available to `EcsEngine.Replay` and its test project via `[InternalsVisibleTo]`.
+- D-055: `TickScheduler` manages current tick interval in milliseconds. `SetInterval(int ms)` records a `SetTickIntervalOperation` to the attached op-log. `SetIntervalDirect(int ms)` is internal and sets the interval without recording (used during replay). `WorldReplayer` calls `op.ApplyToScheduler(scheduler)` for every operation; only `SetTickIntervalOperation` has a non-default implementation.
+- D-056: Snapshot binary layout: 4-byte magic (`ECSS`), 2-byte version (1), 1-byte `SnapshotMode`, 4-byte tick, 4-byte entity count, N×4 entity IDs, 4-byte component-type count, then per type: 2-byte UTF-8 type-name length, UTF-8 name bytes, 4-byte entity count, per entity: 4-byte entity ID + component data. `SnapshotMode.TickBoundary` requires no pending mutations at write time; `SnapshotMode.Immediate` is always allowed. On read, unknown type names throw `InvalidDataException`.
+- D-057: `ComponentSerializerRegistry` maps `Type → IComponentSerializer` via user-registered typed delegates (`Action<BinaryWriter, T>` write + `Func<BinaryReader, T>` read). Serializers are iterated in deterministic order (sorted by `Type.FullName`). On snapshot read, all component adds are queued then committed with a single `ApplySafePoint`.
+- D-058: `WorldHasher` computes a deterministic `ulong` using FNV-1a over: tick, alive entity IDs sorted ascending, then for each registered `ComponentHasherRegistry` entry (sorted by type name): per entity with that component (sorted by entity ID) hashed with a user-supplied `Func<T, uint>`. This is AOT-safe with no reflection on the hash path.
+
 ## Deferred Scope
 
 - S-001: Additional area-editing tools beyond lasso are acknowledged and deferred for later design.

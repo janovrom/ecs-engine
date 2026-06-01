@@ -1,5 +1,6 @@
 using System.Collections;
 using EcsEngine.Core.Query;
+using EcsEngine.Core.Replay;
 using EcsEngine.Core.Storage;
 
 namespace EcsEngine.Core;
@@ -15,20 +16,48 @@ public sealed class EcsWorld
     private readonly Dictionary<Type, IList> _NextTickEvents = [];
     private readonly Dictionary<Type, IList> _CurrentTickEvents = [];
     private readonly QueryRegistry _QueryRegistry;
+    private OpLog? _OpLog;
 
     public int Tick { get; private set; }
+
+    /// <summary>The set of alive entity ID values. Exposed for hashing and snapshot enumeration.</summary>
+    public IReadOnlySet<int> AliveEntityIds => _AliveEntityIds;
 
     public EcsWorld()
     {
         _QueryRegistry = new QueryRegistry(_ArchetypeRegistry);
     }
 
+    /// <summary>Starts recording all world mutations to <paramref name="log"/>.</summary>
+    public void AttachOpLog(OpLog log) => _OpLog = log;
+
+    /// <summary>Stops recording mutations.</summary>
+    public void DetachOpLog() => _OpLog = null;
+
     public EntityId CreateEntity()
     {
         EntityId entityId = new(_nextEntityId++);
         _AliveEntityIds.Add(entityId.Value);
+        _OpLog?.Record(new CreateEntityOperation(entityId));
         return entityId;
     }
+
+    /// <summary>
+    /// Creates an entity with a specific ID. Used by <c>WorldReplayer</c> and
+    /// <c>SnapshotReader</c> to restore exact entity IDs without re-running through
+    /// the public API. Does not record to the op-log.
+    /// </summary>
+    internal EntityId CreateEntityWithId(int specificId)
+    {
+        EntityId entityId = new(specificId);
+        if (_nextEntityId <= specificId)
+            _nextEntityId = specificId + 1;
+        _AliveEntityIds.Add(specificId);
+        return entityId;
+    }
+
+    /// <summary>Restores the tick counter directly. Used by <c>SnapshotReader</c>.</summary>
+    internal void SetTick(int tick) => Tick = tick;
 
     public bool Exists(EntityId entityId) => _AliveEntityIds.Contains(entityId.Value);
 
@@ -40,6 +69,7 @@ public sealed class EcsWorld
     {
         EnsureEntityExists(entityId);
         _PendingDeletionEntityIds.Add(entityId.Value);
+        _OpLog?.Record(new MarkForDeletionOperation(entityId));
     }
 
     public void QueueAddComponent<T>(EntityId entityId, in T component)
@@ -51,6 +81,8 @@ public sealed class EcsWorld
             _PendingComponentMutations.Add(new ArchetypeAddMutation<T>(entityId, component));
         else
             _PendingComponentMutations.Add(new SparseAddMutation<T>(entityId, component));
+        T c = component;
+        _OpLog?.Record(new AddComponentOperation<T>(entityId, c));
     }
 
     public void QueueRemoveComponent<T>(EntityId entityId)
@@ -62,6 +94,7 @@ public sealed class EcsWorld
             _PendingComponentMutations.Add(new ArchetypeRemoveMutation<T>(entityId));
         else
             _PendingComponentMutations.Add(new SparseRemoveMutation<T>(entityId));
+        _OpLog?.Record(new RemoveComponentOperation<T>(entityId));
     }
 
     public bool TryGetComponent<T>(EntityId entityId, out T component)
@@ -94,6 +127,8 @@ public sealed class EcsWorld
             _NextTickEvents[type] = list;
         }
         ((List<T>)list).Add(@event);
+        T e = @event;
+        _OpLog?.Record(new QueueEventOperation<T>(e));
     }
 
     public IReadOnlyList<T> GetCurrentTickEvents<T>()
@@ -106,6 +141,7 @@ public sealed class EcsWorld
 
     public void AdvanceTick()
     {
+        _OpLog?.Record(new AdvanceTickOperation());
         Tick++;
         _CurrentTickEvents.Clear();
         foreach ((Type type, IList eventsForType) in _NextTickEvents)
@@ -115,6 +151,7 @@ public sealed class EcsWorld
 
     public void ApplySafePoint()
     {
+        _OpLog?.Record(new ApplySafePointOperation());
         foreach (IComponentMutation mutation in _PendingComponentMutations)
             mutation.Apply(this);
         _PendingComponentMutations.Clear();
