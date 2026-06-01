@@ -14,10 +14,10 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: '10.0.x'
 
@@ -34,12 +34,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: '10.0.x'
 
       - name: Publish AOT (linux-x64)
         run: dotnet publish src/EcsEngine.Runtime/EcsEngine.Runtime.csproj -c Release -r linux-x64 -p:PublishAot=true -o ./artifacts/aot/linux-x64
+
+  aot-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Publish AOT (windows-x64)
+        run: dotnet publish src/EcsEngine.Runtime/EcsEngine.Runtime.csproj -c Release -r win-x64 -p:PublishAot=true -o ./artifacts/aot/windows-x64
