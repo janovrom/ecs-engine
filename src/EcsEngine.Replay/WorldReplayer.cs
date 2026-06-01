@@ -24,11 +24,9 @@ public sealed class WorldReplayer
     public EcsWorld Run(TickScheduler? scheduler = null)
     {
         EcsWorld world = new();
+        ReplayContext ctx = new(world, scheduler);
         foreach (IWorldOperation op in _Log.Operations)
-        {
-            op.Apply(world);
-            op.ApplyToScheduler(scheduler);
-        }
+            op.Apply(in ctx);
         return world;
     }
 }

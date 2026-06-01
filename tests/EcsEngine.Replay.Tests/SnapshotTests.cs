@@ -8,11 +8,6 @@ namespace EcsEngine.Replay.Tests;
 [TestFixture]
 public class SnapshotTests
 {
-    [ArchetypeStorage]
-    private readonly record struct Position(float X, float Y) : IEcsComponent;
-
-    private readonly record struct Tag(int Id) : IEcsComponent;
-
     private static ComponentSerializerRegistry BuildRegistry()
     {
         ComponentSerializerRegistry r = new();
@@ -164,8 +159,8 @@ public class SnapshotTests
         EcsWorld restored = reader.Read(br);
 
         ComponentHasherRegistry hashers = new();
-        hashers.Register<Position>(p => (uint)(p.X * 1000) ^ (uint)(p.Y * 1000));
-        hashers.Register<Tag>(t => (uint)t.Id);
+        hashers.Register<Position>();
+        hashers.Register<Tag>();
         WorldHasher hasher = new(hashers);
 
         Assert.That(hasher.Hash(restored), Is.EqualTo(hasher.Hash(world)));

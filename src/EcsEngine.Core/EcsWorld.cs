@@ -59,20 +59,20 @@ public sealed class EcsWorld
     /// <summary>Restores the tick counter directly. Used by <c>SnapshotReader</c>.</summary>
     internal void SetTick(int tick) => Tick = tick;
 
-    public bool Exists(EntityId entityId) => _AliveEntityIds.Contains(entityId.Value);
+    public bool Exists(in EntityId entityId) => _AliveEntityIds.Contains(entityId.Value);
 
-    public bool IsMarkedForDeletion(EntityId entityId) => _PendingDeletionEntityIds.Contains(entityId.Value);
+    public bool IsMarkedForDeletion(in EntityId entityId) => _PendingDeletionEntityIds.Contains(entityId.Value);
 
-    public bool CanSchedule(EntityId entityId) => Exists(entityId) && !IsMarkedForDeletion(entityId);
+    public bool CanSchedule(in EntityId entityId) => Exists(entityId) && !IsMarkedForDeletion(entityId);
 
-    public void MarkForDeletion(EntityId entityId)
+    public void MarkForDeletion(in EntityId entityId)
     {
         EnsureEntityExists(entityId);
         _PendingDeletionEntityIds.Add(entityId.Value);
         _OpLog?.Record(new MarkForDeletionOperation(entityId));
     }
 
-    public void QueueAddComponent<T>(EntityId entityId, in T component)
+    public void QueueAddComponent<T>(in EntityId entityId, in T component)
         where T : struct, IEcsComponent
     {
         EnsureEntityCanMutate(entityId);
@@ -85,7 +85,7 @@ public sealed class EcsWorld
         _OpLog?.Record(new AddComponentOperation<T>(entityId, c));
     }
 
-    public void QueueRemoveComponent<T>(EntityId entityId)
+    public void QueueRemoveComponent<T>(in EntityId entityId)
         where T : struct, IEcsComponent
     {
         EnsureEntityCanMutate(entityId);
@@ -97,7 +97,7 @@ public sealed class EcsWorld
         _OpLog?.Record(new RemoveComponentOperation<T>(entityId));
     }
 
-    public bool TryGetComponent<T>(EntityId entityId, out T component)
+    public bool TryGetComponent<T>(in EntityId entityId, out T component)
         where T : struct, IEcsComponent
     {
         component = default;
@@ -352,7 +352,7 @@ public sealed class EcsWorld
 
     // --- Private mutation application ---
 
-    private void ApplyArchetypeAdd<T>(EntityId entityId, in T component)
+    private void ApplyArchetypeAdd<T>(in EntityId entityId, in T component)
         where T : struct, IEcsComponent
     {
         ArchetypeKey currentKey = _ArchetypeRegistry.GetCurrentKey(entityId);
@@ -369,7 +369,7 @@ public sealed class EcsWorld
         newLocation.Chunk!.GetColumn<T>()[newLocation.SlotIndex] = component;
     }
 
-    private void ApplyArchetypeRemove<T>(EntityId entityId)
+    private void ApplyArchetypeRemove<T>(in EntityId entityId)
         where T : struct, IEcsComponent
     {
         ArchetypeKey currentKey = _ArchetypeRegistry.GetCurrentKey(entityId);
@@ -378,11 +378,11 @@ public sealed class EcsWorld
         _ArchetypeRegistry.MoveEntity(entityId, newKey);
     }
 
-    private void ApplySparseAdd<T>(EntityId entityId, in T component)
+    private void ApplySparseAdd<T>(in EntityId entityId, in T component)
         where T : struct, IEcsComponent
         => GetOrCreateSparseStore<T>().Set(entityId, component);
 
-    private void ApplySparseRemove<T>(EntityId entityId)
+    private void ApplySparseRemove<T>(in EntityId entityId)
         where T : struct, IEcsComponent
     {
         if (_SparseStores.TryGetValue(typeof(T), out ISparseStore? store))
@@ -434,14 +434,14 @@ public sealed class EcsWorld
 
     // --- Guards ---
 
-    private void EnsureEntityCanMutate(EntityId entityId)
+    private void EnsureEntityCanMutate(in EntityId entityId)
     {
         EnsureEntityExists(entityId);
         if (IsMarkedForDeletion(entityId))
             throw new InvalidOperationException($"{entityId} is marked for deletion and cannot accept new mutations.");
     }
 
-    private void EnsureEntityExists(EntityId entityId)
+    private void EnsureEntityExists(in EntityId entityId)
     {
         if (!Exists(entityId))
             throw new InvalidOperationException($"{entityId} does not exist.");

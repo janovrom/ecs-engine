@@ -7,12 +7,7 @@ namespace EcsEngine.Replay.Tests;
 [TestFixture]
 public class ReplayTests
 {
-    // --- Test component and event types ---
-
-    [ArchetypeStorage]
-    private readonly record struct Position(float X, float Y) : IEcsComponent;
-
-    private readonly record struct Health(int Value) : IEcsComponent;
+    // --- Test event type (local — not a component, no hasher needed) ---
 
     private readonly record struct DamageEvent(int Amount) : IEcsEvent;
 
@@ -122,8 +117,8 @@ public class ReplayTests
         original.ApplySafePoint();
 
         ComponentHasherRegistry hashers = new();
-        hashers.Register<Health>(h => (uint)h.Value);
-        hashers.Register<Position>(p => (uint)(p.X * 100) ^ (uint)(p.Y * 100));
+        hashers.Register<Health>();
+        hashers.Register<Position>();
 
         WorldHasher hasher = new(hashers);
 
@@ -150,7 +145,7 @@ public class ReplayTests
         original.AdvanceTick();
 
         ComponentHasherRegistry hashers = new();
-        hashers.Register<Health>(h => (uint)h.Value);
+        hashers.Register<Health>();
         WorldHasher hasher = new(hashers);
 
         EcsWorld replayed = new WorldReplayer(log).Run();

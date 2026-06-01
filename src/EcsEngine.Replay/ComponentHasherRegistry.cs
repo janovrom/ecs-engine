@@ -35,6 +35,15 @@ public sealed class ComponentHasherRegistry
         };
     }
 
+    /// <summary>
+    /// Registers the deterministic hasher for <typeparamref name="T"/> using
+    /// <see cref="DeterministicHasher{T}.Default"/>, which is populated automatically
+    /// by the EcsEngine.SourceGen source generator.
+    /// </summary>
+    public void Register<T>()
+        where T : struct, IEcsComponent =>
+        Register<T>(c => DeterministicHasher<T>.Default.Hash(in c));
+
     internal ulong ComputeHash(EcsWorld world)
     {
         ulong h = Fnv1aOffset;

@@ -19,7 +19,7 @@ internal sealed class SparseSetStore<T> : ISparseStore
     public Span<int> DenseEntityIds => _DenseEntityIds.AsSpan(0, _Count);
     public Span<T> DenseData => _DenseData.AsSpan(0, _Count);
 
-    public bool TryGet(EntityId entity, out T component)
+    public bool TryGet(in EntityId entity, out T component)
     {
         int id = entity.Value;
         if (id >= _Sparse.Length || _Sparse[id] < 0)
@@ -31,7 +31,7 @@ internal sealed class SparseSetStore<T> : ISparseStore
         return true;
     }
 
-    public void Set(EntityId entity, in T component)
+    public void Set(in EntityId entity, in T component)
     {
         int id = entity.Value;
         EnsureSparseCapacity(id + 1);
@@ -49,7 +49,7 @@ internal sealed class SparseSetStore<T> : ISparseStore
         _Count++;
     }
 
-    public void Remove(EntityId entity)
+    public void Remove(in EntityId entity)
     {
         int id = entity.Value;
         if (id >= _Sparse.Length || _Sparse[id] < 0)

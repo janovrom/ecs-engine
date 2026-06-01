@@ -1,9 +1,4 @@
 ﻿using System;
 
-namespace EcsEngine.SourceGen
-{
-    public class Class1
-    {
-
-    }
-}
+// This file intentionally left empty.
+// See DeterministicHasherGenerator.cs for the source generator implementation.

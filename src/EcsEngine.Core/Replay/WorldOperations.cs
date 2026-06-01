@@ -6,46 +6,43 @@ namespace EcsEngine.Core.Replay;
 
 internal sealed record CreateEntityOperation(EntityId EntityId) : IWorldOperation
 {
-    public void Apply(EcsWorld world) => world.CreateEntityWithId(EntityId.Value);
+    public void Apply(in ReplayContext ctx) => ctx.World.CreateEntityWithId(EntityId.Value);
 }
 
 internal sealed record MarkForDeletionOperation(EntityId EntityId) : IWorldOperation
 {
-    public void Apply(EcsWorld world) => world.MarkForDeletion(EntityId);
+    public void Apply(in ReplayContext ctx) => ctx.World.MarkForDeletion(EntityId);
 }
 
 internal sealed record AddComponentOperation<T>(EntityId EntityId, T Component) : IWorldOperation
     where T : struct, IEcsComponent
 {
-    public void Apply(EcsWorld world) { T c = Component; world.QueueAddComponent(EntityId, in c); }
+    public void Apply(in ReplayContext ctx) { T c = Component; ctx.World.QueueAddComponent(EntityId, in c); }
 }
 
 internal sealed record RemoveComponentOperation<T>(EntityId EntityId) : IWorldOperation
     where T : struct, IEcsComponent
 {
-    public void Apply(EcsWorld world) => world.QueueRemoveComponent<T>(EntityId);
+    public void Apply(in ReplayContext ctx) => ctx.World.QueueRemoveComponent<T>(EntityId);
 }
 
 internal sealed record QueueEventOperation<T>(T Event) : IWorldOperation
     where T : struct, IEcsEvent
 {
-    public void Apply(EcsWorld world) { T e = Event; world.QueueEvent(in e); }
+    public void Apply(in ReplayContext ctx) { T e = Event; ctx.World.QueueEvent(in e); }
 }
 
 internal sealed record AdvanceTickOperation : IWorldOperation
 {
-    public void Apply(EcsWorld world) => world.AdvanceTick();
+    public void Apply(in ReplayContext ctx) => ctx.World.AdvanceTick();
 }
 
 internal sealed record ApplySafePointOperation : IWorldOperation
 {
-    public void Apply(EcsWorld world) => world.ApplySafePoint();
+    public void Apply(in ReplayContext ctx) => ctx.World.ApplySafePoint();
 }
 
 internal sealed record SetTickIntervalOperation(int IntervalMs) : IWorldOperation
 {
-    /// <summary>No effect on the world itself; tick interval is a host concern.</summary>
-    public void Apply(EcsWorld world) { }
-
-    public void ApplyToScheduler(TickScheduler? scheduler) => scheduler?.SetIntervalDirect(IntervalMs);
+    public void Apply(in ReplayContext ctx) => ctx.Scheduler?.SetIntervalDirect(IntervalMs);
 }

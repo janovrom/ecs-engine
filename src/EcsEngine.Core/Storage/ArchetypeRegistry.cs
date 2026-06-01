@@ -9,10 +9,10 @@ internal sealed class ArchetypeRegistry
 
     public IReadOnlyDictionary<ArchetypeKey, Archetype> AllArchetypes => _Archetypes;
 
-    public EntityLocation GetLocation(EntityId entity)
+    public EntityLocation GetLocation(in EntityId entity)
         => _EntityLocations.TryGetValue(entity.Value, out EntityLocation loc) ? loc : EntityLocation.None;
 
-    public ArchetypeKey GetCurrentKey(EntityId entity)
+    public ArchetypeKey GetCurrentKey(in EntityId entity)
     {
         EntityLocation loc = GetLocation(entity);
         return loc.IsValid ? loc.Chunk.Owner.Key : ArchetypeKey.Empty;
@@ -20,7 +20,7 @@ internal sealed class ArchetypeRegistry
 
     // Moves entity to newKey, copying shared components from its current location.
     // If newKey is empty, removes entity from archetype storage entirely.
-    public EntityLocation MoveEntity(EntityId entity, ArchetypeKey newKey)
+    public EntityLocation MoveEntity(in EntityId entity, ArchetypeKey newKey)
     {
         EntityLocation oldLocation = GetLocation(entity);
         ArchetypeKey oldKey = oldLocation.IsValid ? oldLocation.Chunk.Owner.Key : ArchetypeKey.Empty;
@@ -55,7 +55,7 @@ internal sealed class ArchetypeRegistry
         return newLocation;
     }
 
-    public void RemoveEntity(EntityId entity)
+    public void RemoveEntity(in EntityId entity)
     {
         if (!_EntityLocations.TryGetValue(entity.Value, out EntityLocation loc))
             return;

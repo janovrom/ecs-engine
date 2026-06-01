@@ -1,3 +1,5 @@
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using EcsEngine.Core;
 
 namespace EcsEngine.Replay;
@@ -28,6 +30,10 @@ public sealed class ComponentSerializerRegistry
     /// Tries to get the serializer registered for the given type name.
     /// Returns false if no serializer has been registered for that name.
     /// </summary>
-    public bool TryGetSerializer(string typeName, out IComponentSerializer? serializer)
-        => _Serializers.TryGetValue(typeName, out serializer);
+    public bool TryGetSerializer(string typeName, [NotNullWhen(true)] out IComponentSerializer? serializer)
+    {
+        bool found = _Serializers.TryGetValue(typeName, out serializer);
+        Debug.Assert(!found || serializer is not null);
+        return found;
+    }
 }

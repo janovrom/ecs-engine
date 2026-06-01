@@ -17,6 +17,8 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\EcsEngine.Core\EcsEngine.Core.csproj" />
     <ProjectReference Include="..\..\src\EcsEngine.Replay\EcsEngine.Replay.csproj" />
+    <ProjectReference Include="..\..\src\EcsEngine.SourceGen\EcsEngine.SourceGen.csproj"
+                      OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
 </Project>
