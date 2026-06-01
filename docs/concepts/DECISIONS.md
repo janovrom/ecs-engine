@@ -53,6 +53,13 @@ Status: Final
 - D-045: Query caching is lazy — matched-archetype lists are built on first call and invalidated when a new archetype is created. `world.PreloadQuery<T1,...>()` warms the cache eagerly to avoid first-call latency on the hot path.
 - D-046: Benchmarks live in `tests/EcsEngine.Benchmarks` using BenchmarkDotNet. Invoked via `dotnet run -c Release`; not part of `dotnet test`.
 
+- D-047: Systems are classes implementing `IEcsSystem` and optionally annotated with `[EcsSystem]`. The `[EcsSystem]` attribute is reserved for future Roslyn source generation (M10). For M4, all systems must implement `IEcsSystem`.
+- D-048: Systems declare read/write access and execution ordering by overriding the static default `IEcsSystem.Configure(ISystemBuilder builder)` method. The default implementation is a no-op.
+- D-049: `ISystemBuilder` fluent API — `ReadComponent<T>()`, `WriteComponent<T>()`, `RejectComponent<T>()` declare component access; `After<TSystem>()` and `Before<TSystem>()` declare execution order constraints.
+- D-050: Cycle detection runs at `SystemScheduler.Build()` using Kahn's topological sort. A detected cycle throws `SystemSchedulingException` naming the involved system types. Roslyn compile-time detection is deferred to M10.
+- D-051: `SystemExecutor.Run(EcsWorld)` is the single execution entry point per D-033. M4 execution is sequential. Parallel batching of independent systems is deferred to M5.
+- D-052: Topological sort order is deterministic across runs: when multiple systems have no mutual ordering constraint, they are ordered by `Type.FullName` ascending.
+
 ## Deferred Scope
 
 - S-001: Additional area-editing tools beyond lasso are acknowledged and deferred for later design.

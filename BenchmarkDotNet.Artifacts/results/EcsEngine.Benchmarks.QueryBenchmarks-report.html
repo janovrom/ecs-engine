@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='utf-8' />
+<title>EcsEngine.Benchmarks.QueryBenchmarks-20260530-021617</title>
+
+<style type="text/css">
+	table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
+	td, th { padding: 6px 13px; border: 1px solid #ddd; text-align: right; }
+	tr { background-color: #fff; border-top: 1px solid #ccc; }
+	tr:nth-child(even) { background: #f8f8f8; }
+</style>
+</head>
+<body>
+<pre><code>
+BenchmarkDotNet v0.14.0, Fedora Linux 43 (Workstation Edition)
+Intel Core i5-8400 CPU 2.80GHz (Coffee Lake), 1 CPU, 6 logical and 6 physical cores
+.NET SDK 10.0.108
+  [Host]     : .NET 10.0.8 (10.0.826.23019), X64 RyuJIT AVX2
+  DefaultJob : .NET 10.0.8 (10.0.826.23019), X64 RyuJIT AVX2
+</code></pre>
+<pre><code></code></pre>
+
+<table>
+<thead><tr><th>Method              </th><th>EntityCount</th><th>Mean </th><th>Error</th><th>StdDev</th><th>Gen0</th><th>Allocated</th>
+</tr>
+</thead><tbody><tr><td>QueryEach_PositionVelocity</td><td>100</td><td>256.2 ns</td><td>1.97 ns</td><td>1.84 ns</td><td>0.0253</td><td>120 B</td>
+</tr><tr><td>QueryEach_PositionVelocity</td><td>1000</td><td>1,230.5 ns</td><td>8.74 ns</td><td>8.17 ns</td><td>0.0248</td><td>120 B</td>
+</tr><tr><td>QueryEach_PositionVelocity</td><td>10000</td><td>11,323.3 ns</td><td>60.70 ns</td><td>53.81 ns</td><td>0.0153</td><td>120 B</td>
+</tr></tbody></table>
+</body>
+</html>
