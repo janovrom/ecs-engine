@@ -17,6 +17,8 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\EcsEngine.Core\EcsEngine.Core.csproj" />
     <ProjectReference Include="..\..\src\EcsEngine.Simulation\EcsEngine.Simulation.csproj" />
+    <ProjectReference Include="..\..\src\EcsEngine.Runtime\EcsEngine.Runtime.csproj" />
+    <ProjectReference Include="..\..\src\EcsEngine.Transport\EcsEngine.Transport.csproj" />
   </ItemGroup>
 
 </Project>
