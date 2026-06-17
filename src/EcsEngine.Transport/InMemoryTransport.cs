@@ -9,6 +9,7 @@ namespace EcsEngine.Transport;
 public sealed class InMemoryTransport : ITransport
 {
     private readonly ConcurrentQueue<TransportMessage> _Queue = new();
+    private readonly Lock _PublishGate = new();
     private int _sequence;
 
     public int PendingCount => _Queue.Count;
@@ -19,8 +20,11 @@ public sealed class InMemoryTransport : ITransport
 
         // Copy to keep message payload immutable after publish.
         byte[] copy = payload.ToArray();
-        int sequence = Interlocked.Increment(ref _sequence);
-        _Queue.Enqueue(new TransportMessage(sequence, topic, copy));
+        lock (_PublishGate)
+        {
+            int sequence = Interlocked.Increment(ref _sequence);
+            _Queue.Enqueue(new TransportMessage(sequence, topic, copy));
+        }
     }
 
     public bool TryRead(out TransportMessage message) => _Queue.TryDequeue(out message);
