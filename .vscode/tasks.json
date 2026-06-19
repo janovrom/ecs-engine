@@ -1,0 +1,232 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build:debug",
+            "command": "dotnet",
+            "type": "shell",
+            "args": [
+                "build",
+                "EcsEngine.slnx",
+                "-c",
+                "Debug",
+                "-v",
+                "minimal"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "silent",
+                "panel": "shared"
+            },
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "build:release",
+            "command": "dotnet",
+            "type": "shell",
+            "args": [
+                "build",
+                "EcsEngine.slnx",
+                "-c",
+                "Release",
+                "-v",
+                "minimal"
+            ],
+            "group": {
+                "kind": "build"
+            },
+            "presentation": {
+                "reveal": "silent",
+                "panel": "shared"
+            },
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "test:all",
+            "command": "dotnet",
+            "type": "shell",
+            "args": [
+                "test",
+                "EcsEngine.slnx",
+                "-v",
+                "minimal",
+                "--no-build"
+            ],
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "problemMatcher": "$msCompile",
+            "dependsOn": "build:debug"
+        },
+        {
+            "label": "test:core",
+            "command": "dotnet",
+            "type": "shell",
+            "args": [
+                "test",
+                "tests/EcsEngine.Core.Tests/EcsEngine.Core.Tests.csproj",
+                "-v",
+                "minimal",
+                "--no-build"
+            ],
+            "group": {
+                "kind": "test"
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "problemMatcher": "$msCompile",
+            "dependsOn": "build:debug"
+        },
+        {
+            "label": "test:replay",
+            "command": "dotnet",
+            "type": "shell",
+            "args": [
+                "test",
+                "tests/EcsEngine.Replay.Tests/EcsEngine.Replay.Tests.csproj",
+                "-v",
+                "minimal",
+                "--no-build"
+            ],
+            "group": {
+                "kind": "test"
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "problemMatcher": "$msCompile",
+            "dependsOn": "build:debug"
+        },
+        {
+            "label": "test:integration",
+            "command": "dotnet",
+            "type": "shell",
+            "args": [
+                "test",
+                "tests/EcsEngine.Integration.Tests/EcsEngine.Integration.Tests.csproj",
+                "-v",
+                "minimal",
+                "--no-build"
+            ],
+            "group": {
+                "kind": "test"
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "problemMatcher": "$msCompile",
+            "dependsOn": "build:debug"
+        },
+        {
+            "label": "publish:aot-linux",
+            "command": "dotnet",
+            "type": "shell",
+            "args": [
+                "publish",
+                "src/EcsEngine.Runtime/EcsEngine.Runtime.csproj",
+                "-c",
+                "Release",
+                "-r",
+                "linux-x64",
+                "-p:PublishAot=true",
+                "-v",
+                "minimal"
+            ],
+            "group": {
+                "kind": "build"
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "publish:aot-windows",
+            "command": "dotnet",
+            "type": "shell",
+            "args": [
+                "publish",
+                "src/EcsEngine.Runtime/EcsEngine.Runtime.csproj",
+                "-c",
+                "Release",
+                "-r",
+                "win-x64",
+                "-p:PublishAot=true",
+                "-v",
+                "minimal"
+            ],
+            "group": {
+                "kind": "build"
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "build:benchmarks",
+            "command": "dotnet",
+            "type": "shell",
+            "args": [
+                "build",
+                "tests/EcsEngine.Benchmarks/EcsEngine.Benchmarks.csproj",
+                "-c",
+                "Release",
+                "-v",
+                "minimal"
+            ],
+            "group": {
+                "kind": "build"
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "run:benchmarks",
+            "command": "dotnet",
+            "type": "shell",
+            "args": [
+                "run",
+                "-c",
+                "Release",
+                "--project",
+                "tests/EcsEngine.Benchmarks"
+            ],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "dependsOn": "build:benchmarks"
+        },
+        {
+            "label": "clean",
+            "command": "dotnet",
+            "type": "shell",
+            "args": [
+                "clean",
+                "EcsEngine.slnx"
+            ],
+            "presentation": {
+                "reveal": "silent",
+                "panel": "shared"
+            }
+        }
+    ]
+}

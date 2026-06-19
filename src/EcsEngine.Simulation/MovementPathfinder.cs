@@ -12,6 +12,8 @@ public static class MovementPathfinder
         out string? error)
     {
         ArgumentNullException.ThrowIfNull(grid);
+        ArgumentOutOfRangeException.ThrowIfNegative(profile.Speed);
+        ArgumentOutOfRangeException.ThrowIfNegative(profile.ClimbSpeed);
 
         path = [];
         error = null;
@@ -22,64 +24,91 @@ public static class MovementPathfinder
             return false;
         }
 
+        if (!IsWalkableSurfaceCell(grid, start))
+        {
+            error = $"Start cell {start} is not on a walkable surface.";
+            return false;
+        }
+
         if (grid.IsOccupied(target))
         {
             error = $"Target cell {target} is occupied.";
             return false;
         }
 
-        int maxSpeedUnits = MovementRules.ComputeEffectiveSpeed(profile.Speed, modifiers) * 2;
-        int maxClimbUnits = MovementRules.ComputeEffectiveSpeed(profile.ClimbSpeed, modifiers) * 2;
-
-        PathState startState = new(start, maxSpeedUnits, maxClimbUnits);
-        PriorityQueue<PathState, int> frontier = new();
-        frontier.Enqueue(startState, 0);
-
-        Dictionary<PathState, int> bestCost = new()
+        if (!IsWalkableSurfaceCell(grid, target))
         {
-            [startState] = 0
+            error = $"Target cell {target} is not on a walkable surface.";
+            return false;
+        }
+
+        int maxMovementUnits = MovementRules.ComputeEffectiveSpeed(profile.Speed, modifiers) * 2;
+        int maxReachSteps = maxMovementUnits / 2;
+
+        PriorityQueue<GridPosition, int> frontier = new();
+        int startHeuristic = EstimateRemainingCostUnits(start, target);
+        frontier.Enqueue(start, startHeuristic);
+
+        Dictionary<GridPosition, int> bestCostByPosition = new()
+        {
+            [start] = 0
         };
 
-        Dictionary<PathState, PathState?> previous = new()
+        Dictionary<GridPosition, GridPosition?> previous = new()
         {
-            [startState] = null
+            [start] = null
         };
 
-        while (frontier.TryDequeue(out PathState current, out _))
+        while (frontier.TryDequeue(out GridPosition current, out int dequeuedPriority))
         {
-            if (current.Position == target)
+            int currentCost = bestCostByPosition[current];
+            int expectedPriority = currentCost + EstimateRemainingCostUnits(current, target);
+            if (dequeuedPriority != expectedPriority)
+                continue;
+
+            if (currentCost > maxMovementUnits)
+                continue;
+
+            if (currentCost + EstimateRemainingCostUnits(current, target) > maxMovementUnits)
+                continue;
+
+            if (current == target)
             {
                 path = ReconstructPath(previous, current);
                 return true;
             }
 
-            foreach (GridPosition next in GetNeighbors(current.Position))
+            foreach (GridPosition next in GetNeighbors(current))
             {
                 if (grid.IsOccupied(next))
                     continue;
 
-                int costUnits = MovementRules.GetStepCostUnits(current.Position, next);
-                bool usesClimb = current.Position.Z != next.Z;
-
-                int nextSpeedUnits = current.SpeedUnits;
-                int nextClimbUnits = current.ClimbUnits;
-                if (usesClimb)
-                    nextClimbUnits -= costUnits;
-                else
-                    nextSpeedUnits -= costUnits;
-
-                if (nextSpeedUnits < 0 || nextClimbUnits < 0)
+                if (!IsWalkableSurfaceCell(grid, next))
                     continue;
 
-                PathState nextState = new(next, nextSpeedUnits, nextClimbUnits);
-                int nextCost = bestCost[current] + costUnits;
-
-                if (bestCost.TryGetValue(nextState, out int knownCost) && knownCost <= nextCost)
+                if (IsOutsideReachableRadius(start, next, maxReachSteps))
                     continue;
 
-                bestCost[nextState] = nextCost;
-                previous[nextState] = current;
-                frontier.Enqueue(nextState, nextCost);
+                int stepCostUnits = ComputeStepCostUnits(current, next, profile);
+                if (stepCostUnits == int.MaxValue)
+                    continue;
+
+                int nextCost = currentCost + stepCostUnits;
+
+                if (nextCost > maxMovementUnits)
+                    continue;
+
+                int lowerBoundToTarget = EstimateRemainingCostUnits(next, target);
+                if (nextCost + lowerBoundToTarget > maxMovementUnits)
+                    continue;
+
+                if (bestCostByPosition.TryGetValue(next, out int knownCost) && knownCost <= nextCost)
+                    continue;
+
+                bestCostByPosition[next] = nextCost;
+                previous[next] = current;
+                int priority = nextCost + EstimateRemainingCostUnits(next, target);
+                frontier.Enqueue(next, priority);
             }
         }
 
@@ -97,6 +126,8 @@ public static class MovementPathfinder
     {
         ArgumentNullException.ThrowIfNull(grid);
         ArgumentNullException.ThrowIfNull(path);
+        ArgumentOutOfRangeException.ThrowIfNegative(profile.Speed);
+        ArgumentOutOfRangeException.ThrowIfNegative(profile.ClimbSpeed);
 
         totalCost = 0m;
         error = null;
@@ -113,8 +144,7 @@ public static class MovementPathfinder
             return false;
         }
 
-        int remainingSpeedUnits = MovementRules.ComputeEffectiveSpeed(profile.Speed, modifiers) * 2;
-        int remainingClimbUnits = MovementRules.ComputeEffectiveSpeed(profile.ClimbSpeed, modifiers) * 2;
+        int remainingMovementUnits = MovementRules.ComputeEffectiveSpeed(profile.Speed, modifiers) * 2;
 
         for (int i = 1; i < path.Count; i++)
         {
@@ -130,7 +160,7 @@ public static class MovementPathfinder
             int stepCostUnits;
             try
             {
-                stepCostUnits = MovementRules.GetStepCostUnits(from, to);
+                stepCostUnits = ComputeStepCostUnits(from, to, profile);
             }
             catch (ArgumentOutOfRangeException)
             {
@@ -138,13 +168,14 @@ public static class MovementPathfinder
                 return false;
             }
 
-            bool usesClimb = from.Z != to.Z;
-            if (usesClimb)
-                remainingClimbUnits -= stepCostUnits;
-            else
-                remainingSpeedUnits -= stepCostUnits;
+            if (stepCostUnits == int.MaxValue)
+            {
+                error = "Path exceeds movement budget.";
+                return false;
+            }
 
-            if (remainingSpeedUnits < 0 || remainingClimbUnits < 0)
+            remainingMovementUnits -= stepCostUnits;
+            if (remainingMovementUnits < 0)
             {
                 error = "Path exceeds movement budget.";
                 return false;
@@ -157,15 +188,15 @@ public static class MovementPathfinder
     }
 
     private static IReadOnlyList<GridPosition> ReconstructPath(
-        Dictionary<PathState, PathState?> previous,
-        PathState end)
+        Dictionary<GridPosition, GridPosition?> previous,
+        GridPosition end)
     {
-        List<GridPosition> reversed = [end.Position];
-        PathState? cursor = previous[end];
+        List<GridPosition> reversed = [end];
+        GridPosition? cursor = previous[end];
 
         while (cursor is not null)
         {
-            reversed.Add(cursor.Value.Position);
+            reversed.Add(cursor.Value);
             cursor = previous[cursor.Value];
         }
 
@@ -184,11 +215,64 @@ public static class MovementPathfinder
                     if (dx == 0 && dy == 0 && dz == 0)
                         continue;
 
+                    // Surface traversal: disallow pure vertical hops with no planar movement.
+                    if (dx == 0 && dy == 0)
+                        continue;
+
                     yield return new GridPosition(position.X + dx, position.Y + dy, position.Z + dz);
                 }
             }
         }
     }
 
-    private readonly record struct PathState(GridPosition Position, int SpeedUnits, int ClimbUnits);
+    private static bool IsOutsideReachableRadius(in GridPosition start, in GridPosition candidate, int maxReachSteps)
+    {
+        int dx = Math.Abs(candidate.X - start.X);
+        int dy = Math.Abs(candidate.Y - start.Y);
+        int dz = Math.Abs(candidate.Z - start.Z);
+        int chebyshevDistance = Math.Max(dx, Math.Max(dy, dz));
+        return chebyshevDistance > maxReachSteps;
+    }
+
+    private static int EstimateRemainingCostUnits(in GridPosition from, in GridPosition to)
+    {
+        int dx = Math.Abs(to.X - from.X);
+        int dy = Math.Abs(to.Y - from.Y);
+        int dz = Math.Abs(to.Z - from.Z);
+
+        // Admissible lower bound for this movement model:
+        // minimum step cost is 2 units, and at least max(planar, vertical) adjacent
+        // moves are needed when diagonal movement is allowed.
+        int planarDistance = Math.Max(dx, dy);
+        int minSteps = Math.Max(planarDistance, dz);
+        return minSteps * 2;
+    }
+
+    private static int ComputeStepCostUnits(in GridPosition from, in GridPosition to, in MovementProfile profile)
+    {
+        int baseCostUnits = MovementRules.GetStepCostUnits(from, to);
+
+        bool usesClimb = from.Z != to.Z;
+        if (!usesClimb)
+            return baseCostUnits;
+
+        if (profile.ClimbSpeed <= 0)
+            return int.MaxValue;
+
+        decimal climbPenalty = Math.Max(1m, (decimal)Math.Max(profile.Speed, 1) / profile.ClimbSpeed);
+        return (int)Math.Ceiling(baseCostUnits * climbPenalty);
+    }
+
+    private static bool IsWalkableSurfaceCell(OccupancyGrid grid, in GridPosition position)
+    {
+        if (grid.IsOccupied(position))
+            return false;
+
+        if (position.Z == 0)
+            return true;
+
+        GridPosition below = position with { Z = position.Z - 1 };
+        return grid.IsOccupied(below);
+    }
+
 }

@@ -10,22 +10,25 @@ public sealed class RuntimeHost
     public RuntimeServiceProvider Services { get; }
     public ITransport? Transport { get; }
     public SystemExecutor Executor { get; }
+    public ISystemExecutionObserver? ExecutionObserver { get; }
 
     internal RuntimeHost(
         StartupMode startupMode,
         RuntimeServiceProvider services,
         ITransport? transport,
-        SystemExecutor executor)
+        SystemExecutor executor,
+        ISystemExecutionObserver? executionObserver)
     {
         StartupMode = startupMode;
         Services = services;
         Transport = transport;
         Executor = executor;
+        ExecutionObserver = executionObserver;
     }
 
     public void RunTick(EcsWorld world)
     {
-        Executor.Run(world);
+        Executor.Run(world, ExecutionObserver);
         world.ApplySafePoint();
         world.AdvanceTick();
     }

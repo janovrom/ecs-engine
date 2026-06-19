@@ -11,6 +11,7 @@ public sealed class RuntimeHostBuilder
 {
     private readonly RuntimeServiceCollection _Services = new();
     private readonly List<SystemRegistration> _Registrations = [];
+    private ISystemExecutionObserver? _ExecutionObserver;
     private bool _registrationClosed;
 
     public StartupMode StartupMode { get; private set; } = StartupMode.Local;
@@ -26,6 +27,16 @@ public sealed class RuntimeHostBuilder
     {
         ArgumentNullException.ThrowIfNull(config);
         StartupMode = config.StartupMode;
+
+        if (config.Observability.Enabled && _ExecutionObserver is null)
+            _ExecutionObserver = new MetricsSystemExecutionObserver(config.Observability);
+
+        return this;
+    }
+
+    public RuntimeHostBuilder UseSystemExecutionObserver(ISystemExecutionObserver observer)
+    {
+        _ExecutionObserver = observer ?? throw new ArgumentNullException(nameof(observer));
         return this;
     }
 
@@ -77,7 +88,7 @@ public sealed class RuntimeHostBuilder
             scheduler.Register(system);
         }
 
-        return new RuntimeHost(StartupMode, serviceProvider, Transport, scheduler.Build());
+        return new RuntimeHost(StartupMode, serviceProvider, Transport, scheduler.Build(), _ExecutionObserver);
     }
 
     private void EnsureRegistrationOpen()

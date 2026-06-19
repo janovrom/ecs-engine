@@ -1,0 +1,31 @@
+{
+    "[csharp]": {
+        "editor.defaultFormatter": "ms-dotnettools.csharp",
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.fixAll": "explicit",
+            "source.organizeImports": "explicit"
+        }
+    },
+    "omnisharp.enableRoslynAnalyzers": true,
+    "omnisharp.enableEditorConfigSupport": true,
+    "omnisharp.enableReferenceCodeLens": true,
+    "omnisharp.warningsAsErrors": true,
+    "files.exclude": {
+        "**/bin": true,
+        "**/obj": true,
+        "**/.vs": true,
+        "**/artifacts": false
+    },
+    "search.exclude": {
+        "**/bin": true,
+        "**/obj": true,
+        "**/artifacts": true,
+        "**/.git": true
+    },
+    "dotnet.defaultSolutionOrFolder": "${workspaceFolder}/EcsEngine.slnx",
+    "debug.internalConsoleOptions": "neverOpen",
+    "terminal.integrated.env.linux": {
+        "PATH": "${workspaceFolder}/artifacts/bin/EcsEngine.SnapshotInspector/debug:${env:PATH}"
+    }
+}

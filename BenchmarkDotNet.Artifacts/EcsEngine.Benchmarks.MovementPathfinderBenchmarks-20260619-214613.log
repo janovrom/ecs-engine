@@ -1,0 +1,81 @@
+// Validating benchmarks:
+// ***** BenchmarkRunner: Start   *****
+// ***** Found 27 benchmark(s) in total *****
+// ***** Building 1 exe(s) in Parallel: Start   *****
+Unable to find .sln or .csproj file. Will use current directory /mnt/sdb2/ecs-engine to search for project file. If you don't use .sln file on purpose it should not be a problem.
+// start dotnet  restore /p:UseSharedCompilation=false /p:BuildInParallel=false /m:1 /p:Deterministic=true /p:Optimize=true /p:IntermediateOutputPath="/mnt/sdb2/ecs-engine/artifacts/bin/EcsEngine.Benchmarks/release/c1ad5ad8-a3f6-4e69-99b8-8ac522936f20/obj/Release/net10.0/" /p:OutDir="/mnt/sdb2/ecs-engine/artifacts/bin/EcsEngine.Benchmarks/release/c1ad5ad8-a3f6-4e69-99b8-8ac522936f20/bin/Release/net10.0/" /p:OutputPath="/mnt/sdb2/ecs-engine/artifacts/bin/EcsEngine.Benchmarks/release/c1ad5ad8-a3f6-4e69-99b8-8ac522936f20/bin/Release/net10.0/" in /mnt/sdb2/ecs-engine/artifacts/bin/EcsEngine.Benchmarks/release/c1ad5ad8-a3f6-4e69-99b8-8ac522936f20
+// command took 1.52 sec and exited with 0
+// start dotnet  build -c Release --no-restore /p:UseSharedCompilation=false /p:BuildInParallel=false /m:1 /p:Deterministic=true /p:Optimize=true /p:IntermediateOutputPath="/mnt/sdb2/ecs-engine/artifacts/bin/EcsEngine.Benchmarks/release/c1ad5ad8-a3f6-4e69-99b8-8ac522936f20/obj/Release/net10.0/" /p:OutDir="/mnt/sdb2/ecs-engine/artifacts/bin/EcsEngine.Benchmarks/release/c1ad5ad8-a3f6-4e69-99b8-8ac522936f20/bin/Release/net10.0/" /p:OutputPath="/mnt/sdb2/ecs-engine/artifacts/bin/EcsEngine.Benchmarks/release/c1ad5ad8-a3f6-4e69-99b8-8ac522936f20/bin/Release/net10.0/" --output "/mnt/sdb2/ecs-engine/artifacts/bin/EcsEngine.Benchmarks/release/c1ad5ad8-a3f6-4e69-99b8-8ac522936f20/bin/Release/net10.0/" in /mnt/sdb2/ecs-engine/artifacts/bin/EcsEngine.Benchmarks/release/c1ad5ad8-a3f6-4e69-99b8-8ac522936f20
+// command took 23.83 sec and exited with 0
+// ***** Done, took 00:00:25 (25.43 sec)   *****
+// Found 27 benchmarks:
+//   MovementPathfinderBenchmarks.TryFindPath_OpenGrid: DefaultJob [GridSize=16, ObstacleRatio=0]
+//   MovementPathfinderBenchmarks.TryFindPath_WithObstacles: DefaultJob [GridSize=16, ObstacleRatio=0]
+//   MovementPathfinderBenchmarks.TryValidatePath_Precomputed: DefaultJob [GridSize=16, ObstacleRatio=0]
+//   MovementPathfinderBenchmarks.TryFindPath_OpenGrid: DefaultJob [GridSize=16, ObstacleRatio=0.1]
+//   MovementPathfinderBenchmarks.TryFindPath_WithObstacles: DefaultJob [GridSize=16, ObstacleRatio=0.1]
+//   MovementPathfinderBenchmarks.TryValidatePath_Precomputed: DefaultJob [GridSize=16, ObstacleRatio=0.1]
+//   MovementPathfinderBenchmarks.TryFindPath_OpenGrid: DefaultJob [GridSize=16, ObstacleRatio=0.2]
+//   MovementPathfinderBenchmarks.TryFindPath_WithObstacles: DefaultJob [GridSize=16, ObstacleRatio=0.2]
+//   MovementPathfinderBenchmarks.TryValidatePath_Precomputed: DefaultJob [GridSize=16, ObstacleRatio=0.2]
+//   MovementPathfinderBenchmarks.TryFindPath_OpenGrid: DefaultJob [GridSize=32, ObstacleRatio=0]
+//   MovementPathfinderBenchmarks.TryFindPath_WithObstacles: DefaultJob [GridSize=32, ObstacleRatio=0]
+//   MovementPathfinderBenchmarks.TryValidatePath_Precomputed: DefaultJob [GridSize=32, ObstacleRatio=0]
+//   MovementPathfinderBenchmarks.TryFindPath_OpenGrid: DefaultJob [GridSize=32, ObstacleRatio=0.1]
+//   MovementPathfinderBenchmarks.TryFindPath_WithObstacles: DefaultJob [GridSize=32, ObstacleRatio=0.1]
+//   MovementPathfinderBenchmarks.TryValidatePath_Precomputed: DefaultJob [GridSize=32, ObstacleRatio=0.1]
+//   MovementPathfinderBenchmarks.TryFindPath_OpenGrid: DefaultJob [GridSize=32, ObstacleRatio=0.2]
+//   MovementPathfinderBenchmarks.TryFindPath_WithObstacles: DefaultJob [GridSize=32, ObstacleRatio=0.2]
+//   MovementPathfinderBenchmarks.TryValidatePath_Precomputed: DefaultJob [GridSize=32, ObstacleRatio=0.2]
+//   MovementPathfinderBenchmarks.TryFindPath_OpenGrid: DefaultJob [GridSize=64, ObstacleRatio=0]
+//   MovementPathfinderBenchmarks.TryFindPath_WithObstacles: DefaultJob [GridSize=64, ObstacleRatio=0]
+//   MovementPathfinderBenchmarks.TryValidatePath_Precomputed: DefaultJob [GridSize=64, ObstacleRatio=0]
+//   MovementPathfinderBenchmarks.TryFindPath_OpenGrid: DefaultJob [GridSize=64, ObstacleRatio=0.1]
+//   MovementPathfinderBenchmarks.TryFindPath_WithObstacles: DefaultJob [GridSize=64, ObstacleRatio=0.1]
+//   MovementPathfinderBenchmarks.TryValidatePath_Precomputed: DefaultJob [GridSize=64, ObstacleRatio=0.1]
+//   MovementPathfinderBenchmarks.TryFindPath_OpenGrid: DefaultJob [GridSize=64, ObstacleRatio=0.2]
+//   MovementPathfinderBenchmarks.TryFindPath_WithObstacles: DefaultJob [GridSize=64, ObstacleRatio=0.2]
+//   MovementPathfinderBenchmarks.TryValidatePath_Precomputed: DefaultJob [GridSize=64, ObstacleRatio=0.2]
+
+// **************************
+// Benchmark: MovementPathfinderBenchmarks.TryFindPath_OpenGrid: DefaultJob [GridSize=16, ObstacleRatio=0]
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet c1ad5ad8-a3f6-4e69-99b8-8ac522936f20.dll --anonymousPipes 119 120 --benchmarkName "EcsEngine.Benchmarks.MovementPathfinderBenchmarks.TryFindPath_OpenGrid(GridSize: 16, ObstacleRatio: 0)" --job Default --benchmarkId 0 in /mnt/sdb2/ecs-engine/artifacts/bin/EcsEngine.Benchmarks/release/c1ad5ad8-a3f6-4e69-99b8-8ac522936f20/bin/Release/net10.0
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// BenchmarkDotNet v0.14.0
+// Runtime=.NET 10.0.8 (10.0.826.23019), X64 RyuJIT AVX2
+// GC=Concurrent Workstation
+// HardwareIntrinsics=AVX2,AES,BMI1,BMI2,FMA,LZCNT,PCLMUL,POPCNT VectorSize=256
+// Job: DefaultJob
+
+OverheadJitting  1: 1 op, 330625.00 ns, 330.6250 us/op
+WorkloadJitting  1: 1 op, 25190195064.00 ns, 25.1902 s/op
+
+WorkloadWarmup   1: 1 op, 27371003544.00 ns, 27.3710 s/op
+WorkloadWarmup   2: 1 op, 27930671197.00 ns, 27.9307 s/op
+WorkloadWarmup   3: 1 op, 28586433292.00 ns, 28.5864 s/op
+WorkloadWarmup   4: 1 op, 28652671190.00 ns, 28.6527 s/op
+WorkloadWarmup   5: 1 op, 26148787223.00 ns, 26.1488 s/op
+WorkloadWarmup   6: 1 op, 26864389989.00 ns, 26.8644 s/op
+WorkloadWarmup   7: 1 op, 25701140563.00 ns, 25.7011 s/op
+
+// BeforeActualRun
+WorkloadActual   1: 1 op, 24894612533.00 ns, 24.8946 s/op
+WorkloadActual   2: 1 op, 27230732294.00 ns, 27.2307 s/op
+WorkloadActual   3: 1 op, 26751708409.00 ns, 26.7517 s/op
+WorkloadActual   4: 1 op, 26723582374.00 ns, 26.7236 s/op
+WorkloadActual   5: 1 op, 27481327609.00 ns, 27.4813 s/op
+WorkloadActual   6: 1 op, 30630577452.00 ns, 30.6306 s/op
+WorkloadActual   7: 1 op, 27147105252.00 ns, 27.1471 s/op
+WorkloadActual   8: 1 op, 28193218401.00 ns, 28.1932 s/op
+WorkloadActual   9: 1 op, 29447190037.00 ns, 29.4472 s/op
+WorkloadActual  10: 1 op, 29167284048.00 ns, 29.1673 s/op
+WorkloadActual  11: 1 op, 27558663932.00 ns, 27.5587 s/op
+WorkloadActual  12: 1 op, 27700235875.00 ns, 27.7002 s/op
+WorkloadActual  13: 1 op, 27723908642.00 ns, 27.7239 s/op
+WorkloadActual  14: 1 op, 27526121135.00 ns, 27.5261 s/op
+WorkloadActual  15: 1 op, 27358475094.00 ns, 27.3585 s/op
+WorkloadActual  16: 1 op, 27241346896.00 ns, 27.2413 s/op

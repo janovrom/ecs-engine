@@ -1,0 +1,659 @@
+// Validating benchmarks:
+// ***** BenchmarkRunner: Start   *****
+// ***** Found 39 benchmark(s) in total *****
+// ***** Building 1 exe(s) in Parallel: Start   *****
+Unable to find .sln or .csproj file. Will use current directory /mnt/sdb2/ecs-engine to search for project file. If you don't use .sln file on purpose it should not be a problem.
+// start dotnet  restore /p:UseSharedCompilation=false /p:BuildInParallel=false /m:1 /p:Deterministic=true /p:Optimize=true /p:IntermediateOutputPath="/mnt/sdb2/ecs-engine/artifacts/bin/EcsEngine.Benchmarks/release/1c2e0494-52a7-4d9a-8ad3-67d263ada620/obj/Release/net10.0/" /p:OutDir="/mnt/sdb2/ecs-engine/artifacts/bin/EcsEngine.Benchmarks/release/1c2e0494-52a7-4d9a-8ad3-67d263ada620/bin/Release/net10.0/" /p:OutputPath="/mnt/sdb2/ecs-engine/artifacts/bin/EcsEngine.Benchmarks/release/1c2e0494-52a7-4d9a-8ad3-67d263ada620/bin/Release/net10.0/" in /mnt/sdb2/ecs-engine/artifacts/bin/EcsEngine.Benchmarks/release/1c2e0494-52a7-4d9a-8ad3-67d263ada620
+// command took 1.99 sec and exited with 0
+// start dotnet  build -c Release --no-restore /p:UseSharedCompilation=false /p:BuildInParallel=false /m:1 /p:Deterministic=true /p:Optimize=true /p:IntermediateOutputPath="/mnt/sdb2/ecs-engine/artifacts/bin/EcsEngine.Benchmarks/release/1c2e0494-52a7-4d9a-8ad3-67d263ada620/obj/Release/net10.0/" /p:OutDir="/mnt/sdb2/ecs-engine/artifacts/bin/EcsEngine.Benchmarks/release/1c2e0494-52a7-4d9a-8ad3-67d263ada620/bin/Release/net10.0/" /p:OutputPath="/mnt/sdb2/ecs-engine/artifacts/bin/EcsEngine.Benchmarks/release/1c2e0494-52a7-4d9a-8ad3-67d263ada620/bin/Release/net10.0/" --output "/mnt/sdb2/ecs-engine/artifacts/bin/EcsEngine.Benchmarks/release/1c2e0494-52a7-4d9a-8ad3-67d263ada620/bin/Release/net10.0/" in /mnt/sdb2/ecs-engine/artifacts/bin/EcsEngine.Benchmarks/release/1c2e0494-52a7-4d9a-8ad3-67d263ada620
+// command took 29.03 sec and exited with 0
+// ***** Done, took 00:00:31 (31.31 sec)   *****
+// Found 27 benchmarks:
+//   MovementPathfinderBenchmarks.TryFindPath_OpenGrid: DefaultJob [GridSize=16, ObstacleRatio=0]
+//   MovementPathfinderBenchmarks.TryFindPath_WithObstacles: DefaultJob [GridSize=16, ObstacleRatio=0]
+//   MovementPathfinderBenchmarks.TryValidatePath_Precomputed: DefaultJob [GridSize=16, ObstacleRatio=0]
+//   MovementPathfinderBenchmarks.TryFindPath_OpenGrid: DefaultJob [GridSize=16, ObstacleRatio=0.1]
+//   MovementPathfinderBenchmarks.TryFindPath_WithObstacles: DefaultJob [GridSize=16, ObstacleRatio=0.1]
+//   MovementPathfinderBenchmarks.TryValidatePath_Precomputed: DefaultJob [GridSize=16, ObstacleRatio=0.1]
+//   MovementPathfinderBenchmarks.TryFindPath_OpenGrid: DefaultJob [GridSize=16, ObstacleRatio=0.2]
+//   MovementPathfinderBenchmarks.TryFindPath_WithObstacles: DefaultJob [GridSize=16, ObstacleRatio=0.2]
+//   MovementPathfinderBenchmarks.TryValidatePath_Precomputed: DefaultJob [GridSize=16, ObstacleRatio=0.2]
+//   MovementPathfinderBenchmarks.TryFindPath_OpenGrid: DefaultJob [GridSize=32, ObstacleRatio=0]
+//   MovementPathfinderBenchmarks.TryFindPath_WithObstacles: DefaultJob [GridSize=32, ObstacleRatio=0]
+//   MovementPathfinderBenchmarks.TryValidatePath_Precomputed: DefaultJob [GridSize=32, ObstacleRatio=0]
+//   MovementPathfinderBenchmarks.TryFindPath_OpenGrid: DefaultJob [GridSize=32, ObstacleRatio=0.1]
+//   MovementPathfinderBenchmarks.TryFindPath_WithObstacles: DefaultJob [GridSize=32, ObstacleRatio=0.1]
+//   MovementPathfinderBenchmarks.TryValidatePath_Precomputed: DefaultJob [GridSize=32, ObstacleRatio=0.1]
+//   MovementPathfinderBenchmarks.TryFindPath_OpenGrid: DefaultJob [GridSize=32, ObstacleRatio=0.2]
+//   MovementPathfinderBenchmarks.TryFindPath_WithObstacles: DefaultJob [GridSize=32, ObstacleRatio=0.2]
+//   MovementPathfinderBenchmarks.TryValidatePath_Precomputed: DefaultJob [GridSize=32, ObstacleRatio=0.2]
+//   MovementPathfinderBenchmarks.TryFindPath_OpenGrid: DefaultJob [GridSize=64, ObstacleRatio=0]
+//   MovementPathfinderBenchmarks.TryFindPath_WithObstacles: DefaultJob [GridSize=64, ObstacleRatio=0]
+//   MovementPathfinderBenchmarks.TryValidatePath_Precomputed: DefaultJob [GridSize=64, ObstacleRatio=0]
+//   MovementPathfinderBenchmarks.TryFindPath_OpenGrid: DefaultJob [GridSize=64, ObstacleRatio=0.1]
+//   MovementPathfinderBenchmarks.TryFindPath_WithObstacles: DefaultJob [GridSize=64, ObstacleRatio=0.1]
+//   MovementPathfinderBenchmarks.TryValidatePath_Precomputed: DefaultJob [GridSize=64, ObstacleRatio=0.1]
+//   MovementPathfinderBenchmarks.TryFindPath_OpenGrid: DefaultJob [GridSize=64, ObstacleRatio=0.2]
+//   MovementPathfinderBenchmarks.TryFindPath_WithObstacles: DefaultJob [GridSize=64, ObstacleRatio=0.2]
+//   MovementPathfinderBenchmarks.TryValidatePath_Precomputed: DefaultJob [GridSize=64, ObstacleRatio=0.2]
+
+// **************************
+// Benchmark: MovementPathfinderBenchmarks.TryFindPath_OpenGrid: DefaultJob [GridSize=16, ObstacleRatio=0]
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet 1c2e0494-52a7-4d9a-8ad3-67d263ada620.dll --anonymousPipes 120 121 --benchmarkName "EcsEngine.Benchmarks.MovementPathfinderBenchmarks.TryFindPath_OpenGrid(GridSize: 16, ObstacleRatio: 0)" --job Default --benchmarkId 0 in /mnt/sdb2/ecs-engine/artifacts/bin/EcsEngine.Benchmarks/release/1c2e0494-52a7-4d9a-8ad3-67d263ada620/bin/Release/net10.0
+// Failed to set up high priority (Permission denied). In order to run benchmarks with high priority, make sure you have the right permissions.
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// BenchmarkDotNet v0.14.0
+// Runtime=.NET 10.0.8 (10.0.826.23019), X64 RyuJIT AVX2
+// GC=Concurrent Workstation
+// HardwareIntrinsics=AVX2,AES,BMI1,BMI2,FMA,LZCNT,PCLMUL,POPCNT VectorSize=256
+// Job: DefaultJob
+
+OverheadJitting  1: 1 op, 379431.00 ns, 379.4310 us/op
+WorkloadJitting  1: 1 op, 30921614202.00 ns, 30.9216 s/op
+
+WorkloadWarmup   1: 1 op, 31456183686.00 ns, 31.4562 s/op
+WorkloadWarmup   2: 1 op, 31041030073.00 ns, 31.0410 s/op
+WorkloadWarmup   3: 1 op, 31562924918.00 ns, 31.5629 s/op
+WorkloadWarmup   4: 1 op, 30803870951.00 ns, 30.8039 s/op
+WorkloadWarmup   5: 1 op, 31438142609.00 ns, 31.4381 s/op
+WorkloadWarmup   6: 1 op, 31271771531.00 ns, 31.2718 s/op
+
+// BeforeActualRun
+WorkloadActual   1: 1 op, 31382669592.00 ns, 31.3827 s/op
+WorkloadActual   2: 1 op, 30813222079.00 ns, 30.8132 s/op
+WorkloadActual   3: 1 op, 31345558756.00 ns, 31.3456 s/op
+WorkloadActual   4: 1 op, 31158240025.00 ns, 31.1582 s/op
+WorkloadActual   5: 1 op, 30243642077.00 ns, 30.2436 s/op
+WorkloadActual   6: 1 op, 30925924276.00 ns, 30.9259 s/op
+WorkloadActual   7: 1 op, 31030147455.00 ns, 31.0301 s/op
+WorkloadActual   8: 1 op, 31231705213.00 ns, 31.2317 s/op
+WorkloadActual   9: 1 op, 31104076576.00 ns, 31.1041 s/op
+WorkloadActual  10: 1 op, 31269723296.00 ns, 31.2697 s/op
+WorkloadActual  11: 1 op, 31079328540.00 ns, 31.0793 s/op
+WorkloadActual  12: 1 op, 31086458866.00 ns, 31.0865 s/op
+WorkloadActual  13: 1 op, 30835882948.00 ns, 30.8359 s/op
+WorkloadActual  14: 1 op, 31023121185.00 ns, 31.0231 s/op
+WorkloadActual  15: 1 op, 30219762671.00 ns, 30.2198 s/op
+
+// AfterActualRun
+WorkloadResult   1: 1 op, 31382669592.00 ns, 31.3827 s/op
+WorkloadResult   2: 1 op, 30813222079.00 ns, 30.8132 s/op
+WorkloadResult   3: 1 op, 31345558756.00 ns, 31.3456 s/op
+WorkloadResult   4: 1 op, 31158240025.00 ns, 31.1582 s/op
+WorkloadResult   5: 1 op, 30243642077.00 ns, 30.2436 s/op
+WorkloadResult   6: 1 op, 30925924276.00 ns, 30.9259 s/op
+WorkloadResult   7: 1 op, 31030147455.00 ns, 31.0301 s/op
+WorkloadResult   8: 1 op, 31231705213.00 ns, 31.2317 s/op
+WorkloadResult   9: 1 op, 31104076576.00 ns, 31.1041 s/op
+WorkloadResult  10: 1 op, 31269723296.00 ns, 31.2697 s/op
+WorkloadResult  11: 1 op, 31079328540.00 ns, 31.0793 s/op
+WorkloadResult  12: 1 op, 31086458866.00 ns, 31.0865 s/op
+WorkloadResult  13: 1 op, 30835882948.00 ns, 30.8359 s/op
+WorkloadResult  14: 1 op, 31023121185.00 ns, 31.0231 s/op
+WorkloadResult  15: 1 op, 30219762671.00 ns, 30.2198 s/op
+// GC:  109 9 6 2857666320 1
+// Threading:  0 0 1
+
+// AfterAll
+// Benchmark Process 23423 has exited with code 0.
+
+Mean = 30.983 s, StdErr = 0.090 s (0.29%), N = 15, StdDev = 0.347 s
+Min = 30.220 s, Q1 = 30.881 s, Median = 31.079 s, Q3 = 31.195 s, Max = 31.383 s
+IQR = 0.314 s, LowerFence = 30.410 s, UpperFence = 31.666 s
+ConfidenceInterval = [30.612 s; 31.354 s] (CI 99.9%), Margin = 0.371 s (1.20% of Mean)
+Skewness = -1.11, Kurtosis = 3.19, MValue = 2
+
+// ** Remained 38 (97.4%) benchmark(s) to run. Estimated finish 2026-06-19 9:01 (7h 52m from now) **
+// **************************
+// Benchmark: MovementPathfinderBenchmarks.TryFindPath_WithObstacles: DefaultJob [GridSize=16, ObstacleRatio=0]
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet 1c2e0494-52a7-4d9a-8ad3-67d263ada620.dll --anonymousPipes 120 121 --benchmarkName "EcsEngine.Benchmarks.MovementPathfinderBenchmarks.TryFindPath_WithObstacles(GridSize: 16, ObstacleRatio: 0)" --job Default --benchmarkId 1 in /mnt/sdb2/ecs-engine/artifacts/bin/EcsEngine.Benchmarks/release/1c2e0494-52a7-4d9a-8ad3-67d263ada620/bin/Release/net10.0
+// Failed to set up high priority (Permission denied). In order to run benchmarks with high priority, make sure you have the right permissions.
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// BenchmarkDotNet v0.14.0
+// Runtime=.NET 10.0.8 (10.0.826.23019), X64 RyuJIT AVX2
+// GC=Concurrent Workstation
+// HardwareIntrinsics=AVX2,AES,BMI1,BMI2,FMA,LZCNT,PCLMUL,POPCNT VectorSize=256
+// Job: DefaultJob
+
+OverheadJitting  1: 1 op, 334720.00 ns, 334.7200 us/op
+WorkloadJitting  1: 1 op, 31402208908.00 ns, 31.4022 s/op
+
+WorkloadWarmup   1: 1 op, 30809497563.00 ns, 30.8095 s/op
+WorkloadWarmup   2: 1 op, 31096614994.00 ns, 31.0966 s/op
+WorkloadWarmup   3: 1 op, 30697237830.00 ns, 30.6972 s/op
+WorkloadWarmup   4: 1 op, 31610819022.00 ns, 31.6108 s/op
+WorkloadWarmup   5: 1 op, 31487319003.00 ns, 31.4873 s/op
+WorkloadWarmup   6: 1 op, 30859325910.00 ns, 30.8593 s/op
+
+// BeforeActualRun
+WorkloadActual   1: 1 op, 30989886940.00 ns, 30.9899 s/op
+WorkloadActual   2: 1 op, 30515268073.00 ns, 30.5153 s/op
+WorkloadActual   3: 1 op, 31379330197.00 ns, 31.3793 s/op
+WorkloadActual   4: 1 op, 30888475151.00 ns, 30.8885 s/op
+WorkloadActual   5: 1 op, 30753056998.00 ns, 30.7531 s/op
+WorkloadActual   6: 1 op, 30758545820.00 ns, 30.7585 s/op
+WorkloadActual   7: 1 op, 31028052026.00 ns, 31.0281 s/op
+WorkloadActual   8: 1 op, 30785330111.00 ns, 30.7853 s/op
+WorkloadActual   9: 1 op, 30846778227.00 ns, 30.8468 s/op
+WorkloadActual  10: 1 op, 31001423662.00 ns, 31.0014 s/op
+WorkloadActual  11: 1 op, 30531042782.00 ns, 30.5310 s/op
+WorkloadActual  12: 1 op, 30517279104.00 ns, 30.5173 s/op
+WorkloadActual  13: 1 op, 30707623012.00 ns, 30.7076 s/op
+WorkloadActual  14: 1 op, 30650829815.00 ns, 30.6508 s/op
+WorkloadActual  15: 1 op, 30380949452.00 ns, 30.3809 s/op
+
+// AfterActualRun
+WorkloadResult   1: 1 op, 30989886940.00 ns, 30.9899 s/op
+WorkloadResult   2: 1 op, 30515268073.00 ns, 30.5153 s/op
+WorkloadResult   3: 1 op, 31379330197.00 ns, 31.3793 s/op
+WorkloadResult   4: 1 op, 30888475151.00 ns, 30.8885 s/op
+WorkloadResult   5: 1 op, 30753056998.00 ns, 30.7531 s/op
+WorkloadResult   6: 1 op, 30758545820.00 ns, 30.7585 s/op
+WorkloadResult   7: 1 op, 31028052026.00 ns, 31.0281 s/op
+WorkloadResult   8: 1 op, 30785330111.00 ns, 30.7853 s/op
+WorkloadResult   9: 1 op, 30846778227.00 ns, 30.8468 s/op
+WorkloadResult  10: 1 op, 31001423662.00 ns, 31.0014 s/op
+WorkloadResult  11: 1 op, 30531042782.00 ns, 30.5310 s/op
+WorkloadResult  12: 1 op, 30517279104.00 ns, 30.5173 s/op
+WorkloadResult  13: 1 op, 30707623012.00 ns, 30.7076 s/op
+WorkloadResult  14: 1 op, 30650829815.00 ns, 30.6508 s/op
+WorkloadResult  15: 1 op, 30380949452.00 ns, 30.3809 s/op
+// GC:  109 9 6 2857665648 1
+// Threading:  0 0 1
+
+// AfterAll
+// Benchmark Process 24522 has exited with code 0.
+
+Mean = 30.782 s, StdErr = 0.066 s (0.21%), N = 15, StdDev = 0.255 s
+Min = 30.381 s, Q1 = 30.591 s, Median = 30.759 s, Q3 = 30.939 s, Max = 31.379 s
+IQR = 0.348 s, LowerFence = 30.069 s, UpperFence = 31.462 s
+ConfidenceInterval = [30.509 s; 31.055 s] (CI 99.9%), Margin = 0.273 s (0.89% of Mean)
+Skewness = 0.51, Kurtosis = 2.75, MValue = 2
+
+// ** Remained 37 (94.9%) benchmark(s) to run. Estimated finish 2026-06-19 9:00 (7h 38m from now) **
+// **************************
+// Benchmark: MovementPathfinderBenchmarks.TryValidatePath_Precomputed: DefaultJob [GridSize=16, ObstacleRatio=0]
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet 1c2e0494-52a7-4d9a-8ad3-67d263ada620.dll --anonymousPipes 120 121 --benchmarkName "EcsEngine.Benchmarks.MovementPathfinderBenchmarks.TryValidatePath_Precomputed(GridSize: 16, ObstacleRatio: 0)" --job Default --benchmarkId 2 in /mnt/sdb2/ecs-engine/artifacts/bin/EcsEngine.Benchmarks/release/1c2e0494-52a7-4d9a-8ad3-67d263ada620/bin/Release/net10.0
+// Failed to set up high priority (Permission denied). In order to run benchmarks with high priority, make sure you have the right permissions.
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// BenchmarkDotNet v0.14.0
+// Runtime=.NET 10.0.8 (10.0.826.23019), X64 RyuJIT AVX2
+// GC=Concurrent Workstation
+// HardwareIntrinsics=AVX2,AES,BMI1,BMI2,FMA,LZCNT,PCLMUL,POPCNT VectorSize=256
+// Job: DefaultJob
+
+OverheadJitting  1: 1 op, 345511.00 ns, 345.5110 us/op
+WorkloadJitting  1: 1 op, 1012816.00 ns, 1.0128 ms/op
+
+OverheadJitting  2: 16 op, 494719.00 ns, 30.9199 us/op
+WorkloadJitting  2: 16 op, 574386.00 ns, 35.8991 us/op
+
+WorkloadPilot    1: 16 op, 75334.00 ns, 4.7084 us/op
+WorkloadPilot    2: 32 op, 98172.00 ns, 3.0679 us/op
+WorkloadPilot    3: 64 op, 175035.00 ns, 2.7349 us/op
+WorkloadPilot    4: 128 op, 310598.00 ns, 2.4265 us/op
+WorkloadPilot    5: 256 op, 605514.00 ns, 2.3653 us/op
+WorkloadPilot    6: 512 op, 1241936.00 ns, 2.4257 us/op
+WorkloadPilot    7: 1024 op, 2446575.00 ns, 2.3892 us/op
+WorkloadPilot    8: 2048 op, 4766180.00 ns, 2.3272 us/op
+WorkloadPilot    9: 4096 op, 9643213.00 ns, 2.3543 us/op
+WorkloadPilot   10: 8192 op, 19174163.00 ns, 2.3406 us/op
+WorkloadPilot   11: 16384 op, 38078691.00 ns, 2.3241 us/op
+WorkloadPilot   12: 32768 op, 75238548.00 ns, 2.2961 us/op
+WorkloadPilot   13: 65536 op, 104646638.00 ns, 1.5968 us/op
+WorkloadPilot   14: 131072 op, 85351656.00 ns, 651.1815 ns/op
+WorkloadPilot   15: 262144 op, 170731639.00 ns, 651.2895 ns/op
+WorkloadPilot   16: 524288 op, 343652654.00 ns, 655.4654 ns/op
+WorkloadPilot   17: 1048576 op, 685889262.00 ns, 654.1150 ns/op
+
+OverheadWarmup   1: 1048576 op, 2397469.00 ns, 2.2864 ns/op
+OverheadWarmup   2: 1048576 op, 2388084.00 ns, 2.2775 ns/op
+OverheadWarmup   3: 1048576 op, 2393490.00 ns, 2.2826 ns/op
+OverheadWarmup   4: 1048576 op, 2440809.00 ns, 2.3277 ns/op
+OverheadWarmup   5: 1048576 op, 2520052.00 ns, 2.4033 ns/op
+OverheadWarmup   6: 1048576 op, 2498519.00 ns, 2.3828 ns/op
+OverheadWarmup   7: 1048576 op, 2411423.00 ns, 2.2997 ns/op
+OverheadWarmup   8: 1048576 op, 2370669.00 ns, 2.2608 ns/op
+OverheadWarmup   9: 1048576 op, 2414877.00 ns, 2.3030 ns/op
+OverheadWarmup  10: 1048576 op, 2936613.00 ns, 2.8006 ns/op
+
+OverheadActual   1: 1048576 op, 2677541.00 ns, 2.5535 ns/op
+OverheadActual   2: 1048576 op, 2599488.00 ns, 2.4791 ns/op
+OverheadActual   3: 1048576 op, 2404461.00 ns, 2.2931 ns/op
+OverheadActual   4: 1048576 op, 2446595.00 ns, 2.3333 ns/op
+OverheadActual   5: 1048576 op, 2377906.00 ns, 2.2677 ns/op
+OverheadActual   6: 1048576 op, 2388455.00 ns, 2.2778 ns/op
+OverheadActual   7: 1048576 op, 2412103.00 ns, 2.3004 ns/op
+OverheadActual   8: 1048576 op, 2434014.00 ns, 2.3213 ns/op
+OverheadActual   9: 1048576 op, 2423554.00 ns, 2.3113 ns/op
+OverheadActual  10: 1048576 op, 2835846.00 ns, 2.7045 ns/op
+OverheadActual  11: 1048576 op, 2407187.00 ns, 2.2957 ns/op
+OverheadActual  12: 1048576 op, 2366266.00 ns, 2.2566 ns/op
+OverheadActual  13: 1048576 op, 2452602.00 ns, 2.3390 ns/op
+OverheadActual  14: 1048576 op, 2362374.00 ns, 2.2529 ns/op
+OverheadActual  15: 1048576 op, 2389167.00 ns, 2.2785 ns/op
+
+WorkloadWarmup   1: 1048576 op, 680447071.00 ns, 648.9249 ns/op
+WorkloadWarmup   2: 1048576 op, 678711978.00 ns, 647.2702 ns/op
+WorkloadWarmup   3: 1048576 op, 678413743.00 ns, 646.9858 ns/op
+WorkloadWarmup   4: 1048576 op, 679014145.00 ns, 647.5584 ns/op
+WorkloadWarmup   5: 1048576 op, 678915986.00 ns, 647.4647 ns/op
+WorkloadWarmup   6: 1048576 op, 682636876.00 ns, 651.0133 ns/op
+WorkloadWarmup   7: 1048576 op, 695838739.00 ns, 663.6035 ns/op
+WorkloadWarmup   8: 1048576 op, 697218029.00 ns, 664.9189 ns/op
+WorkloadWarmup   9: 1048576 op, 699981573.00 ns, 667.5544 ns/op
+WorkloadWarmup  10: 1048576 op, 697474403.00 ns, 665.1634 ns/op
+
+// BeforeActualRun
+WorkloadActual   1: 1048576 op, 687552450.00 ns, 655.7011 ns/op
+WorkloadActual   2: 1048576 op, 679837201.00 ns, 648.3433 ns/op
+WorkloadActual   3: 1048576 op, 678027859.00 ns, 646.6178 ns/op
+WorkloadActual   4: 1048576 op, 678082266.00 ns, 646.6696 ns/op
+WorkloadActual   5: 1048576 op, 677936251.00 ns, 646.5304 ns/op
+WorkloadActual   6: 1048576 op, 677763456.00 ns, 646.3656 ns/op
+WorkloadActual   7: 1048576 op, 678013921.00 ns, 646.6045 ns/op
+WorkloadActual   8: 1048576 op, 686644026.00 ns, 654.8348 ns/op
+WorkloadActual   9: 1048576 op, 689224386.00 ns, 657.2956 ns/op
+WorkloadActual  10: 1048576 op, 685805808.00 ns, 654.0354 ns/op
+WorkloadActual  11: 1048576 op, 689347917.00 ns, 657.4134 ns/op
+WorkloadActual  12: 1048576 op, 686856609.00 ns, 655.0375 ns/op
+WorkloadActual  13: 1048576 op, 687001842.00 ns, 655.1760 ns/op
+WorkloadActual  14: 1048576 op, 686425534.00 ns, 654.6264 ns/op
+WorkloadActual  15: 1048576 op, 686028313.00 ns, 654.2476 ns/op
+
+// AfterActualRun
+WorkloadResult   1: 1048576 op, 685140347.00 ns, 653.4008 ns/op
+WorkloadResult   2: 1048576 op, 677425098.00 ns, 646.0429 ns/op
+WorkloadResult   3: 1048576 op, 675615756.00 ns, 644.3174 ns/op
+WorkloadResult   4: 1048576 op, 675670163.00 ns, 644.3693 ns/op
+WorkloadResult   5: 1048576 op, 675524148.00 ns, 644.2300 ns/op
+WorkloadResult   6: 1048576 op, 675351353.00 ns, 644.0652 ns/op
+WorkloadResult   7: 1048576 op, 675601818.00 ns, 644.3041 ns/op
+WorkloadResult   8: 1048576 op, 684231923.00 ns, 652.5344 ns/op
+WorkloadResult   9: 1048576 op, 686812283.00 ns, 654.9952 ns/op
+WorkloadResult  10: 1048576 op, 683393705.00 ns, 651.7350 ns/op
+WorkloadResult  11: 1048576 op, 686935814.00 ns, 655.1130 ns/op
+WorkloadResult  12: 1048576 op, 684444506.00 ns, 652.7371 ns/op
+WorkloadResult  13: 1048576 op, 684589739.00 ns, 652.8757 ns/op
+WorkloadResult  14: 1048576 op, 684013431.00 ns, 652.3260 ns/op
+WorkloadResult  15: 1048576 op, 683616210.00 ns, 651.9472 ns/op
+// GC:  0 0 0 736 1048576
+// Threading:  0 0 1048576
+
+// AfterAll
+// Benchmark Process 25389 has exited with code 0.
+
+Mean = 649.666 ns, StdErr = 1.146 ns (0.18%), N = 15, StdDev = 4.440 ns
+Min = 644.065 ns, Q1 = 644.343 ns, Median = 651.947 ns, Q3 = 652.806 ns, Max = 655.113 ns
+IQR = 8.463 ns, LowerFence = 631.649 ns, UpperFence = 665.501 ns
+ConfidenceInterval = [644.920 ns; 654.413 ns] (CI 99.9%), Margin = 4.747 ns (0.73% of Mean)
+Skewness = -0.27, Kurtosis = 1.15, MValue = 2
+
+// ** Remained 36 (92.3%) benchmark(s) to run. Estimated finish 2026-06-19 6:29 (5h 7m from now) **
+// **************************
+// Benchmark: MovementPathfinderBenchmarks.TryFindPath_OpenGrid: DefaultJob [GridSize=16, ObstacleRatio=0.1]
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet 1c2e0494-52a7-4d9a-8ad3-67d263ada620.dll --anonymousPipes 120 121 --benchmarkName "EcsEngine.Benchmarks.MovementPathfinderBenchmarks.TryFindPath_OpenGrid(GridSize: 16, ObstacleRatio: 0.1)" --job Default --benchmarkId 3 in /mnt/sdb2/ecs-engine/artifacts/bin/EcsEngine.Benchmarks/release/1c2e0494-52a7-4d9a-8ad3-67d263ada620/bin/Release/net10.0
+// Failed to set up high priority (Permission denied). In order to run benchmarks with high priority, make sure you have the right permissions.
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// BenchmarkDotNet v0.14.0
+// Runtime=.NET 10.0.8 (10.0.826.23019), X64 RyuJIT AVX2
+// GC=Concurrent Workstation
+// HardwareIntrinsics=AVX2,AES,BMI1,BMI2,FMA,LZCNT,PCLMUL,POPCNT VectorSize=256
+// Job: DefaultJob
+
+OverheadJitting  1: 1 op, 362477.00 ns, 362.4770 us/op
+WorkloadJitting  1: 1 op, 30729218192.00 ns, 30.7292 s/op
+
+WorkloadWarmup   1: 1 op, 30421931305.00 ns, 30.4219 s/op
+WorkloadWarmup   2: 1 op, 30274891508.00 ns, 30.2749 s/op
+WorkloadWarmup   3: 1 op, 30592449450.00 ns, 30.5924 s/op
+WorkloadWarmup   4: 1 op, 31299008481.00 ns, 31.2990 s/op
+WorkloadWarmup   5: 1 op, 30881879501.00 ns, 30.8819 s/op
+WorkloadWarmup   6: 1 op, 30863107999.00 ns, 30.8631 s/op
+WorkloadWarmup   7: 1 op, 31197338336.00 ns, 31.1973 s/op
+WorkloadWarmup   8: 1 op, 30334783398.00 ns, 30.3348 s/op
+
+// BeforeActualRun
+WorkloadActual   1: 1 op, 30416797998.00 ns, 30.4168 s/op
+WorkloadActual   2: 1 op, 28889206265.00 ns, 28.8892 s/op
+WorkloadActual   3: 1 op, 29397527235.00 ns, 29.3975 s/op
+WorkloadActual   4: 1 op, 29295874367.00 ns, 29.2959 s/op
+WorkloadActual   5: 1 op, 29554494485.00 ns, 29.5545 s/op
+WorkloadActual   6: 1 op, 30422011045.00 ns, 30.4220 s/op
+WorkloadActual   7: 1 op, 30367731893.00 ns, 30.3677 s/op
+WorkloadActual   8: 1 op, 30476447926.00 ns, 30.4764 s/op
+WorkloadActual   9: 1 op, 30566841720.00 ns, 30.5668 s/op
+WorkloadActual  10: 1 op, 30116422736.00 ns, 30.1164 s/op
+WorkloadActual  11: 1 op, 30493166680.00 ns, 30.4932 s/op
+WorkloadActual  12: 1 op, 30338486787.00 ns, 30.3385 s/op
+WorkloadActual  13: 1 op, 30567580530.00 ns, 30.5676 s/op
+WorkloadActual  14: 1 op, 30358215547.00 ns, 30.3582 s/op
+WorkloadActual  15: 1 op, 30501282592.00 ns, 30.5013 s/op
+
+// AfterActualRun
+WorkloadResult   1: 1 op, 30416797998.00 ns, 30.4168 s/op
+WorkloadResult   2: 1 op, 28889206265.00 ns, 28.8892 s/op
+WorkloadResult   3: 1 op, 29397527235.00 ns, 29.3975 s/op
+WorkloadResult   4: 1 op, 29295874367.00 ns, 29.2959 s/op
+WorkloadResult   5: 1 op, 29554494485.00 ns, 29.5545 s/op
+WorkloadResult   6: 1 op, 30422011045.00 ns, 30.4220 s/op
+WorkloadResult   7: 1 op, 30367731893.00 ns, 30.3677 s/op
+WorkloadResult   8: 1 op, 30476447926.00 ns, 30.4764 s/op
+WorkloadResult   9: 1 op, 30566841720.00 ns, 30.5668 s/op
+WorkloadResult  10: 1 op, 30116422736.00 ns, 30.1164 s/op
+WorkloadResult  11: 1 op, 30493166680.00 ns, 30.4932 s/op
+WorkloadResult  12: 1 op, 30338486787.00 ns, 30.3385 s/op
+WorkloadResult  13: 1 op, 30567580530.00 ns, 30.5676 s/op
+WorkloadResult  14: 1 op, 30358215547.00 ns, 30.3582 s/op
+WorkloadResult  15: 1 op, 30501282592.00 ns, 30.5013 s/op
+// GC:  109 9 6 2857666320 1
+// Threading:  0 0 1
+
+// AfterAll
+// Benchmark Process 25501 has exited with code 0.
+
+Mean = 30.117 s, StdErr = 0.141 s (0.47%), N = 15, StdDev = 0.547 s
+Min = 28.889 s, Q1 = 29.835 s, Median = 30.368 s, Q3 = 30.485 s, Max = 30.568 s
+IQR = 0.649 s, LowerFence = 28.861 s, UpperFence = 31.459 s
+ConfidenceInterval = [29.532 s; 30.703 s] (CI 99.9%), Margin = 0.585 s (1.94% of Mean)
+Skewness = -1.03, Kurtosis = 2.43, MValue = 2
+
+// ** Remained 35 (89.7%) benchmark(s) to run. Estimated finish 2026-06-19 7:14 (5h 39m from now) **
+// **************************
+// Benchmark: MovementPathfinderBenchmarks.TryFindPath_WithObstacles: DefaultJob [GridSize=16, ObstacleRatio=0.1]
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet 1c2e0494-52a7-4d9a-8ad3-67d263ada620.dll --anonymousPipes 120 121 --benchmarkName "EcsEngine.Benchmarks.MovementPathfinderBenchmarks.TryFindPath_WithObstacles(GridSize: 16, ObstacleRatio: 0.1)" --job Default --benchmarkId 4 in /mnt/sdb2/ecs-engine/artifacts/bin/EcsEngine.Benchmarks/release/1c2e0494-52a7-4d9a-8ad3-67d263ada620/bin/Release/net10.0
+// Failed to set up high priority (Permission denied). In order to run benchmarks with high priority, make sure you have the right permissions.
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// BenchmarkDotNet v0.14.0
+// Runtime=.NET 10.0.8 (10.0.826.23019), X64 RyuJIT AVX2
+// GC=Concurrent Workstation
+// HardwareIntrinsics=AVX2,AES,BMI1,BMI2,FMA,LZCNT,PCLMUL,POPCNT VectorSize=256
+// Job: DefaultJob
+
+OverheadJitting  1: 1 op, 344199.00 ns, 344.1990 us/op
+WorkloadJitting  1: 1 op, 34265479770.00 ns, 34.2655 s/op
+
+WorkloadWarmup   1: 1 op, 33916434582.00 ns, 33.9164 s/op
+WorkloadWarmup   2: 1 op, 34097291891.00 ns, 34.0973 s/op
+WorkloadWarmup   3: 1 op, 33897514532.00 ns, 33.8975 s/op
+WorkloadWarmup   4: 1 op, 33218566480.00 ns, 33.2186 s/op
+WorkloadWarmup   5: 1 op, 33465339112.00 ns, 33.4653 s/op
+WorkloadWarmup   6: 1 op, 33865627227.00 ns, 33.8656 s/op
+WorkloadWarmup   7: 1 op, 34006882072.00 ns, 34.0069 s/op
+WorkloadWarmup   8: 1 op, 33795894260.00 ns, 33.7959 s/op
+
+// BeforeActualRun
+WorkloadActual   1: 1 op, 33584164627.00 ns, 33.5842 s/op
+WorkloadActual   2: 1 op, 33663940822.00 ns, 33.6639 s/op
+WorkloadActual   3: 1 op, 33954013482.00 ns, 33.9540 s/op
+WorkloadActual   4: 1 op, 33715291092.00 ns, 33.7153 s/op
+WorkloadActual   5: 1 op, 33954581504.00 ns, 33.9546 s/op
+WorkloadActual   6: 1 op, 33802532716.00 ns, 33.8025 s/op
+WorkloadActual   7: 1 op, 33970542081.00 ns, 33.9705 s/op
+WorkloadActual   8: 1 op, 34156318059.00 ns, 34.1563 s/op
+WorkloadActual   9: 1 op, 33979223664.00 ns, 33.9792 s/op
+WorkloadActual  10: 1 op, 34433522122.00 ns, 34.4335 s/op
+WorkloadActual  11: 1 op, 33793518764.00 ns, 33.7935 s/op
+WorkloadActual  12: 1 op, 34463679729.00 ns, 34.4637 s/op
+WorkloadActual  13: 1 op, 33828430917.00 ns, 33.8284 s/op
+WorkloadActual  14: 1 op, 34363945084.00 ns, 34.3639 s/op
+WorkloadActual  15: 1 op, 34708966208.00 ns, 34.7090 s/op
+
+// AfterActualRun
+WorkloadResult   1: 1 op, 33584164627.00 ns, 33.5842 s/op
+WorkloadResult   2: 1 op, 33663940822.00 ns, 33.6639 s/op
+WorkloadResult   3: 1 op, 33954013482.00 ns, 33.9540 s/op
+WorkloadResult   4: 1 op, 33715291092.00 ns, 33.7153 s/op
+WorkloadResult   5: 1 op, 33954581504.00 ns, 33.9546 s/op
+WorkloadResult   6: 1 op, 33802532716.00 ns, 33.8025 s/op
+WorkloadResult   7: 1 op, 33970542081.00 ns, 33.9705 s/op
+WorkloadResult   8: 1 op, 34156318059.00 ns, 34.1563 s/op
+WorkloadResult   9: 1 op, 33979223664.00 ns, 33.9792 s/op
+WorkloadResult  10: 1 op, 34433522122.00 ns, 34.4335 s/op
+WorkloadResult  11: 1 op, 33793518764.00 ns, 33.7935 s/op
+WorkloadResult  12: 1 op, 34463679729.00 ns, 34.4637 s/op
+WorkloadResult  13: 1 op, 33828430917.00 ns, 33.8284 s/op
+WorkloadResult  14: 1 op, 34363945084.00 ns, 34.3639 s/op
+WorkloadResult  15: 1 op, 34708966208.00 ns, 34.7090 s/op
+// GC:  109 9 6 2857906224 1
+// Threading:  0 0 1
+
+// AfterAll
+// Benchmark Process 26207 has exited with code 0.
+
+Mean = 34.025 s, StdErr = 0.086 s (0.25%), N = 15, StdDev = 0.331 s
+Min = 33.584 s, Q1 = 33.798 s, Median = 33.955 s, Q3 = 34.260 s, Max = 34.709 s
+IQR = 0.462 s, LowerFence = 33.105 s, UpperFence = 34.953 s
+ConfidenceInterval = [33.671 s; 34.379 s] (CI 99.9%), Margin = 0.354 s (1.04% of Mean)
+Skewness = 0.59, Kurtosis = 2.04, MValue = 2
+
+// ** Remained 34 (87.2%) benchmark(s) to run. Estimated finish 2026-06-19 7:53 (6h 3m from now) **
+// **************************
+// Benchmark: MovementPathfinderBenchmarks.TryValidatePath_Precomputed: DefaultJob [GridSize=16, ObstacleRatio=0.1]
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet 1c2e0494-52a7-4d9a-8ad3-67d263ada620.dll --anonymousPipes 120 121 --benchmarkName "EcsEngine.Benchmarks.MovementPathfinderBenchmarks.TryValidatePath_Precomputed(GridSize: 16, ObstacleRatio: 0.1)" --job Default --benchmarkId 5 in /mnt/sdb2/ecs-engine/artifacts/bin/EcsEngine.Benchmarks/release/1c2e0494-52a7-4d9a-8ad3-67d263ada620/bin/Release/net10.0
+// Failed to set up high priority (Permission denied). In order to run benchmarks with high priority, make sure you have the right permissions.
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// BenchmarkDotNet v0.14.0
+// Runtime=.NET 10.0.8 (10.0.826.23019), X64 RyuJIT AVX2
+// GC=Concurrent Workstation
+// HardwareIntrinsics=AVX2,AES,BMI1,BMI2,FMA,LZCNT,PCLMUL,POPCNT VectorSize=256
+// Job: DefaultJob
+
+OverheadJitting  1: 1 op, 341833.00 ns, 341.8330 us/op
+WorkloadJitting  1: 1 op, 1163209.00 ns, 1.1632 ms/op
+
+OverheadJitting  2: 16 op, 503740.00 ns, 31.4838 us/op
+WorkloadJitting  2: 16 op, 605782.00 ns, 37.8614 us/op
+
+WorkloadPilot    1: 16 op, 47870.00 ns, 2.9919 us/op
+WorkloadPilot    2: 32 op, 89079.00 ns, 2.7837 us/op
+WorkloadPilot    3: 64 op, 169101.00 ns, 2.6422 us/op
+WorkloadPilot    4: 128 op, 317925.00 ns, 2.4838 us/op
+WorkloadPilot    5: 256 op, 639004.00 ns, 2.4961 us/op
+WorkloadPilot    6: 512 op, 1274213.00 ns, 2.4887 us/op
+WorkloadPilot    7: 1024 op, 2511047.00 ns, 2.4522 us/op
+WorkloadPilot    8: 2048 op, 4849186.00 ns, 2.3678 us/op
+WorkloadPilot    9: 4096 op, 9770895.00 ns, 2.3855 us/op
+WorkloadPilot   10: 8192 op, 19270620.00 ns, 2.3524 us/op
+WorkloadPilot   11: 16384 op, 38579612.00 ns, 2.3547 us/op
+WorkloadPilot   12: 32768 op, 76240130.00 ns, 2.3267 us/op
+WorkloadPilot   13: 65536 op, 104661029.00 ns, 1.5970 us/op
+WorkloadPilot   14: 131072 op, 84849733.00 ns, 647.3521 ns/op
+WorkloadPilot   15: 262144 op, 169734092.00 ns, 647.4842 ns/op
+WorkloadPilot   16: 524288 op, 339117878.00 ns, 646.8160 ns/op
+WorkloadPilot   17: 1048576 op, 678551577.00 ns, 647.1172 ns/op
+
+OverheadWarmup   1: 1048576 op, 2483616.00 ns, 2.3686 ns/op
+OverheadWarmup   2: 1048576 op, 2662145.00 ns, 2.5388 ns/op
+OverheadWarmup   3: 1048576 op, 2437485.00 ns, 2.3246 ns/op
+OverheadWarmup   4: 1048576 op, 2417234.00 ns, 2.3053 ns/op
+OverheadWarmup   5: 1048576 op, 2430938.00 ns, 2.3183 ns/op
+OverheadWarmup   6: 1048576 op, 2410154.00 ns, 2.2985 ns/op
+
+OverheadActual   1: 1048576 op, 2891014.00 ns, 2.7571 ns/op
+OverheadActual   2: 1048576 op, 2437625.00 ns, 2.3247 ns/op
+OverheadActual   3: 1048576 op, 2490389.00 ns, 2.3750 ns/op
+OverheadActual   4: 1048576 op, 2477997.00 ns, 2.3632 ns/op
+OverheadActual   5: 1048576 op, 2393189.00 ns, 2.2823 ns/op
+OverheadActual   6: 1048576 op, 2443641.00 ns, 2.3304 ns/op
+OverheadActual   7: 1048576 op, 2416760.00 ns, 2.3048 ns/op
+OverheadActual   8: 1048576 op, 2461329.00 ns, 2.3473 ns/op
+OverheadActual   9: 1048576 op, 2444182.00 ns, 2.3310 ns/op
+OverheadActual  10: 1048576 op, 2454459.00 ns, 2.3408 ns/op
+OverheadActual  11: 1048576 op, 2457384.00 ns, 2.3435 ns/op
+OverheadActual  12: 1048576 op, 2443423.00 ns, 2.3302 ns/op
+OverheadActual  13: 1048576 op, 2465813.00 ns, 2.3516 ns/op
+OverheadActual  14: 1048576 op, 2458861.00 ns, 2.3450 ns/op
+OverheadActual  15: 1048576 op, 2441064.00 ns, 2.3280 ns/op
+
+WorkloadWarmup   1: 1048576 op, 685622027.00 ns, 653.8601 ns/op
+WorkloadWarmup   2: 1048576 op, 686507374.00 ns, 654.7045 ns/op
+WorkloadWarmup   3: 1048576 op, 685771889.00 ns, 654.0030 ns/op
+WorkloadWarmup   4: 1048576 op, 684654780.00 ns, 652.9377 ns/op
+WorkloadWarmup   5: 1048576 op, 685922077.00 ns, 654.1463 ns/op
+WorkloadWarmup   6: 1048576 op, 686250254.00 ns, 654.4592 ns/op
+WorkloadWarmup   7: 1048576 op, 682135702.00 ns, 650.5353 ns/op
+
+// BeforeActualRun
+WorkloadActual   1: 1048576 op, 683560144.00 ns, 651.8938 ns/op
+WorkloadActual   2: 1048576 op, 694712834.00 ns, 662.5298 ns/op
+WorkloadActual   3: 1048576 op, 686957151.00 ns, 655.1334 ns/op
+WorkloadActual   4: 1048576 op, 684887499.00 ns, 653.1596 ns/op
+WorkloadActual   5: 1048576 op, 689964225.00 ns, 658.0012 ns/op
+WorkloadActual   6: 1048576 op, 684692458.00 ns, 652.9736 ns/op
+WorkloadActual   7: 1048576 op, 687466459.00 ns, 655.6191 ns/op
+WorkloadActual   8: 1048576 op, 688202030.00 ns, 656.3206 ns/op
+WorkloadActual   9: 1048576 op, 687488907.00 ns, 655.6405 ns/op
+WorkloadActual  10: 1048576 op, 681056466.00 ns, 649.5061 ns/op
+WorkloadActual  11: 1048576 op, 689358389.00 ns, 657.4234 ns/op
+WorkloadActual  12: 1048576 op, 677096317.00 ns, 645.7294 ns/op
+WorkloadActual  13: 1048576 op, 675026197.00 ns, 643.7551 ns/op
+WorkloadActual  14: 1048576 op, 672628009.00 ns, 641.4681 ns/op
+WorkloadActual  15: 1048576 op, 675872141.00 ns, 644.5619 ns/op
+
+// AfterActualRun
+WorkloadResult   1: 1048576 op, 681105685.00 ns, 649.5530 ns/op
+WorkloadResult   2: 1048576 op, 692258375.00 ns, 660.1890 ns/op
+WorkloadResult   3: 1048576 op, 684502692.00 ns, 652.7926 ns/op
+WorkloadResult   4: 1048576 op, 682433040.00 ns, 650.8189 ns/op
+WorkloadResult   5: 1048576 op, 687509766.00 ns, 655.6604 ns/op
+WorkloadResult   6: 1048576 op, 682237999.00 ns, 650.6329 ns/op
+WorkloadResult   7: 1048576 op, 685012000.00 ns, 653.2784 ns/op
+WorkloadResult   8: 1048576 op, 685747571.00 ns, 653.9798 ns/op
+WorkloadResult   9: 1048576 op, 685034448.00 ns, 653.2998 ns/op
+WorkloadResult  10: 1048576 op, 678602007.00 ns, 647.1653 ns/op
+WorkloadResult  11: 1048576 op, 686903930.00 ns, 655.0826 ns/op
+WorkloadResult  12: 1048576 op, 674641858.00 ns, 643.3886 ns/op
+WorkloadResult  13: 1048576 op, 672571738.00 ns, 641.4144 ns/op
+WorkloadResult  14: 1048576 op, 670173550.00 ns, 639.1273 ns/op
+WorkloadResult  15: 1048576 op, 673417682.00 ns, 642.2211 ns/op
+// GC:  0 0 0 736 1048576
+// Threading:  0 0 1048576
+
+// AfterAll
+// Benchmark Process 27001 has exited with code 0.
+
+Mean = 649.907 ns, StdErr = 1.562 ns (0.24%), N = 15, StdDev = 6.049 ns
+Min = 639.127 ns, Q1 = 645.277 ns, Median = 650.819 ns, Q3 = 653.640 ns, Max = 660.189 ns
+IQR = 8.363 ns, LowerFence = 632.733 ns, UpperFence = 666.184 ns
+ConfidenceInterval = [643.440 ns; 656.374 ns] (CI 99.9%), Margin = 6.467 ns (1.00% of Mean)
+Skewness = -0.31, Kurtosis = 1.87, MValue = 2
+
+// ** Remained 33 (84.6%) benchmark(s) to run. Estimated finish 2026-06-19 6:49 (4h 58m from now) **
+// **************************
+// Benchmark: MovementPathfinderBenchmarks.TryFindPath_OpenGrid: DefaultJob [GridSize=16, ObstacleRatio=0.2]
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet 1c2e0494-52a7-4d9a-8ad3-67d263ada620.dll --anonymousPipes 120 121 --benchmarkName "EcsEngine.Benchmarks.MovementPathfinderBenchmarks.TryFindPath_OpenGrid(GridSize: 16, ObstacleRatio: 0.2)" --job Default --benchmarkId 6 in /mnt/sdb2/ecs-engine/artifacts/bin/EcsEngine.Benchmarks/release/1c2e0494-52a7-4d9a-8ad3-67d263ada620/bin/Release/net10.0
+// Failed to set up high priority (Permission denied). In order to run benchmarks with high priority, make sure you have the right permissions.
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// BenchmarkDotNet v0.14.0
+// Runtime=.NET 10.0.8 (10.0.826.23019), X64 RyuJIT AVX2
+// GC=Concurrent Workstation
+// HardwareIntrinsics=AVX2,AES,BMI1,BMI2,FMA,LZCNT,PCLMUL,POPCNT VectorSize=256
+// Job: DefaultJob
+
+OverheadJitting  1: 1 op, 322554.00 ns, 322.5540 us/op
+WorkloadJitting  1: 1 op, 25130614681.00 ns, 25.1306 s/op
+
+WorkloadWarmup   1: 1 op, 25117715410.00 ns, 25.1177 s/op
+WorkloadWarmup   2: 1 op, 25109072334.00 ns, 25.1091 s/op
+WorkloadWarmup   3: 1 op, 25098456821.00 ns, 25.0985 s/op
+WorkloadWarmup   4: 1 op, 25129983144.00 ns, 25.1300 s/op
+WorkloadWarmup   5: 1 op, 25136132493.00 ns, 25.1361 s/op
+WorkloadWarmup   6: 1 op, 25153171720.00 ns, 25.1532 s/op
+WorkloadWarmup   7: 1 op, 25102105891.00 ns, 25.1021 s/op
+WorkloadWarmup   8: 1 op, 25135263202.00 ns, 25.1353 s/op
+WorkloadWarmup   9: 1 op, 25123147045.00 ns, 25.1231 s/op
+
+// BeforeActualRun
+WorkloadActual   1: 1 op, 25199894672.00 ns, 25.1999 s/op
+WorkloadActual   2: 1 op, 25182069421.00 ns, 25.1821 s/op
+WorkloadActual   3: 1 op, 25159761788.00 ns, 25.1598 s/op
+WorkloadActual   4: 1 op, 25649986611.00 ns, 25.6500 s/op
+WorkloadActual   5: 1 op, 26061746832.00 ns, 26.0617 s/op
+WorkloadActual   6: 1 op, 25927779915.00 ns, 25.9278 s/op
+WorkloadActual   7: 1 op, 25752498526.00 ns, 25.7525 s/op
+WorkloadActual   8: 1 op, 25456421720.00 ns, 25.4564 s/op
+WorkloadActual   9: 1 op, 25589011226.00 ns, 25.5890 s/op
+WorkloadActual  10: 1 op, 25977211418.00 ns, 25.9772 s/op
+WorkloadActual  11: 1 op, 25963942823.00 ns, 25.9639 s/op
+WorkloadActual  12: 1 op, 25691434925.00 ns, 25.6914 s/op
+WorkloadActual  13: 1 op, 26237577413.00 ns, 26.2376 s/op
+WorkloadActual  14: 1 op, 27263344611.00 ns, 27.2633 s/op
+WorkloadActual  15: 1 op, 27201379733.00 ns, 27.2014 s/op
+
+// AfterActualRun
+WorkloadResult   1: 1 op, 25199894672.00 ns, 25.1999 s/op
+WorkloadResult   2: 1 op, 25182069421.00 ns, 25.1821 s/op
+WorkloadResult   3: 1 op, 25159761788.00 ns, 25.1598 s/op
+WorkloadResult   4: 1 op, 25649986611.00 ns, 25.6500 s/op
+WorkloadResult   5: 1 op, 26061746832.00 ns, 26.0617 s/op
+WorkloadResult   6: 1 op, 25927779915.00 ns, 25.9278 s/op
+WorkloadResult   7: 1 op, 25752498526.00 ns, 25.7525 s/op
+WorkloadResult   8: 1 op, 25456421720.00 ns, 25.4564 s/op
+WorkloadResult   9: 1 op, 25589011226.00 ns, 25.5890 s/op
+WorkloadResult  10: 1 op, 25977211418.00 ns, 25.9772 s/op
+WorkloadResult  11: 1 op, 25963942823.00 ns, 25.9639 s/op
+WorkloadResult  12: 1 op, 25691434925.00 ns, 25.6914 s/op
+WorkloadResult  13: 1 op, 26237577413.00 ns, 26.2376 s/op
+// GC:  109 8 6 2857666320 1
+// Threading:  0 0 1
+
+// AfterAll
+// Benchmark Process 27242 has exited with code 0.
+
+Mean = 25.681 s, StdErr = 0.098 s (0.38%), N = 13, StdDev = 0.354 s
+Min = 25.160 s, Q1 = 25.456 s, Median = 25.691 s, Q3 = 25.964 s, Max = 26.238 s
+IQR = 0.508 s, LowerFence = 24.695 s, UpperFence = 26.725 s
+ConfidenceInterval = [25.257 s; 26.104 s] (CI 99.9%), Margin = 0.423 s (1.65% of Mean)
+Skewness = -0.17, Kurtosis = 1.61, MValue = 2
+
+// ** Remained 32 (82.1%) benchmark(s) to run. Estimated finish 2026-06-19 7:03 (5h 0m from now) **
+// **************************
+// Benchmark: MovementPathfinderBenchmarks.TryFindPath_WithObstacles: DefaultJob [GridSize=16, ObstacleRatio=0.2]
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet 1c2e0494-52a7-4d9a-8ad3-67d263ada620.dll --anonymousPipes 120 121 --benchmarkName "EcsEngine.Benchmarks.MovementPathfinderBenchmarks.TryFindPath_WithObstacles(GridSize: 16, ObstacleRatio: 0.2)" --job Default --benchmarkId 7 in /mnt/sdb2/ecs-engine/artifacts/bin/EcsEngine.Benchmarks/release/1c2e0494-52a7-4d9a-8ad3-67d263ada620/bin/Release/net10.0
+// Failed to set up high priority (Permission denied). In order to run benchmarks with high priority, make sure you have the right permissions.
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// BenchmarkDotNet v0.14.0
+// Runtime=.NET 10.0.8 (10.0.826.23019), X64 RyuJIT AVX2
+// GC=Concurrent Workstation
+// HardwareIntrinsics=AVX2,AES,BMI1,BMI2,FMA,LZCNT,PCLMUL,POPCNT VectorSize=256
+// Job: DefaultJob
+
+OverheadJitting  1: 1 op, 355441.00 ns, 355.4410 us/op
+WorkloadJitting  1: 1 op, 30366085114.00 ns, 30.3661 s/op
+
+WorkloadWarmup   1: 1 op, 30323355954.00 ns, 30.3234 s/op
+WorkloadWarmup   2: 1 op, 30164345535.00 ns, 30.1643 s/op
+WorkloadWarmup   3: 1 op, 30025416168.00 ns, 30.0254 s/op

@@ -43,7 +43,7 @@ public sealed class SystemScheduler
     public SystemExecutor Build()
     {
         if (_Registrations.Count == 0)
-            return new SystemExecutor([]);
+            return new SystemExecutor([], []);
 
         // Index systems by runtime type
         Dictionary<Type, (IEcsSystem System, SystemBuilder Metadata)> nodes = [];
@@ -87,6 +87,14 @@ public sealed class SystemScheduler
             }
         }
 
+        List<SystemDependencyEdge> dependencyEdges =
+        [
+            .. successors
+                .SelectMany(pair => pair.Value.Select(successor => new SystemDependencyEdge(pair.Key, successor)))
+                .OrderBy(static edge => edge.From.FullName, StringComparer.Ordinal)
+                .ThenBy(static edge => edge.To.FullName, StringComparer.Ordinal)
+        ];
+
         // Kahn's topological sort — SortedSet on FullName provides deterministic
         // tie-breaking when multiple systems are equally schedulable (D-052).
         SortedSet<string> available = [];
@@ -124,6 +132,6 @@ public sealed class SystemScheduler
                 cycleTypes);
         }
 
-        return new SystemExecutor([.. ordered]);
+        return new SystemExecutor([.. ordered], [.. dependencyEdges]);
     }
 }

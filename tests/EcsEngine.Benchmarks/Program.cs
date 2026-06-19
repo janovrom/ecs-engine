@@ -1,4 +1,4 @@
 using BenchmarkDotNet.Running;
 using EcsEngine.Benchmarks;
 
-BenchmarkRunner.Run<QueryBenchmarks>();
+BenchmarkSwitcher.FromAssembly(typeof(QueryBenchmarks).Assembly).Run(args);

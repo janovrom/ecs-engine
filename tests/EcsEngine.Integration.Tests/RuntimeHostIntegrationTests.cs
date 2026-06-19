@@ -1,4 +1,5 @@
 using EcsEngine.Core;
+using EcsEngine.Core.Scheduling;
 using EcsEngine.Runtime;
 using EcsEngine.Transport;
 using NUnit.Framework;
@@ -17,6 +18,36 @@ public class RuntimeHostIntegrationTests
             File.WriteAllText(path, "{ \"startupMode\": \"server\" }");
             RuntimeConfig config = RuntimeConfigLoader.LoadFromFile(path);
             Assert.That(config.StartupMode, Is.EqualTo(StartupMode.Server));
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [Test]
+    public void ConfigLoader_ParsesObservabilityConfig_CaseInsensitive()
+    {
+        string path = Path.GetTempFileName();
+        try
+        {
+            File.WriteAllText(path,
+                """
+                {
+                  "startupMode": "local",
+                  "observability": {
+                    "enabled": true,
+                    "publishEveryTicks": 4,
+                    "minimumSeverity": "warning"
+                  }
+                }
+                """);
+
+            RuntimeConfig config = RuntimeConfigLoader.LoadFromFile(path);
+
+            Assert.That(config.Observability.Enabled, Is.True);
+            Assert.That(config.Observability.PublishEveryTicks, Is.EqualTo(4));
+            Assert.That(config.Observability.MinimumSeverity, Is.EqualTo(RuntimeObservabilitySeverity.Warning));
         }
         finally
         {
@@ -72,6 +103,24 @@ public class RuntimeHostIntegrationTests
         host.RunTick(world);
 
         Assert.That(sink.Count, Is.EqualTo(1));
+    }
+
+    [Test]
+    public void RunTick_WithCustomObserver_EmitsExecutionCallbacks()
+    {
+        RuntimeObserver observer = new();
+
+        RuntimeHost host = new RuntimeHostBuilder()
+            .UseSystemExecutionObserver(observer)
+            .RegisterSystem(_ => new ASystem())
+            .Build();
+
+        EcsWorld world = new();
+        host.RunTick(world);
+
+        Assert.That(observer.TickStarts, Is.EqualTo(1));
+        Assert.That(observer.TickCompletes, Is.EqualTo(1));
+        Assert.That(observer.SystemRuns, Is.EqualTo(1));
     }
 
     [Test]
@@ -134,5 +183,30 @@ public class RuntimeHostIntegrationTests
     private sealed class CounterSink
     {
         public int Count { get; set; }
+    }
+
+    private sealed class RuntimeObserver : ISystemExecutionObserver
+    {
+        public int TickStarts { get; private set; }
+        public int TickCompletes { get; private set; }
+        public int SystemRuns { get; private set; }
+
+        public bool IsEnabled => true;
+
+        public bool ShouldSampleTick(int tick) => true;
+
+        public void OnTickStarted(
+            int tick,
+            int systemCount,
+            int batchCount,
+            int maxBatchSize,
+            double batchingEfficiency)
+            => TickStarts++;
+
+        public void OnSystemExecuted(int tick, Type systemType, long elapsedTicks, long allocatedBytes)
+            => SystemRuns++;
+
+        public void OnTickCompleted(int tick, long elapsedTicks, long allocatedBytes)
+            => TickCompletes++;
     }
 }

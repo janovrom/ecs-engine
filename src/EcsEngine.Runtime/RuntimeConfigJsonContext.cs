@@ -6,6 +6,8 @@ namespace EcsEngine.Runtime;
     PropertyNameCaseInsensitive = true,
     UseStringEnumConverter = true)]
 [JsonSerializable(typeof(RuntimeConfig))]
+[JsonSerializable(typeof(RuntimeObservabilityConfig))]
+[JsonSerializable(typeof(RuntimeObservabilitySeverity))]
 internal sealed partial class RuntimeConfigJsonContext : JsonSerializerContext
 {
 }

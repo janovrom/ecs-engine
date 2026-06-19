@@ -1,0 +1,86 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": ".NET Debug Runtime",
+            "type": "coreclr",
+            "request": "launch",
+            "program": "${workspaceFolder}/artifacts/bin/EcsEngine.Runtime/debug/EcsEngine.Runtime.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "stopAtEntry": false,
+            "serverReadyAction": {
+                "pattern": "\\bNow listening on:\\s+(https?://\\S+)",
+                "uriFormat": "{0}",
+                "action": "openExternalUrl"
+            },
+            "console": "internalConsole",
+            "preLaunchTask": "build:debug"
+        },
+        {
+            "name": ".NET Debug Core.Tests",
+            "type": "coreclr",
+            "request": "launch",
+            "program": "${workspaceFolder}/artifacts/bin/EcsEngine.Core.Tests/debug/EcsEngine.Core.Tests.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "stopAtEntry": false,
+            "console": "internalConsole",
+            "preLaunchTask": "build:debug"
+        },
+        {
+            "name": ".NET Debug Replay.Tests",
+            "type": "coreclr",
+            "request": "launch",
+            "program": "${workspaceFolder}/artifacts/bin/EcsEngine.Replay.Tests/debug/EcsEngine.Replay.Tests.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "stopAtEntry": false,
+            "console": "internalConsole",
+            "preLaunchTask": "build:debug"
+        },
+        {
+            "name": ".NET Debug Integration.Tests",
+            "type": "coreclr",
+            "request": "launch",
+            "program": "${workspaceFolder}/artifacts/bin/EcsEngine.Integration.Tests/debug/EcsEngine.Integration.Tests.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "stopAtEntry": false,
+            "console": "internalConsole",
+            "preLaunchTask": "build:debug"
+        },
+        {
+            "name": ".NET Debug SnapshotInspector",
+            "type": "coreclr",
+            "request": "launch",
+            "program": "${workspaceFolder}/artifacts/bin/EcsEngine.SnapshotInspector/debug/EcsEngine.SnapshotInspector.dll",
+            "args": [
+                "${workspaceFolder}/sample-snapshot.bin",
+                "--format",
+                "text"
+            ],
+            "cwd": "${workspaceFolder}",
+            "stopAtEntry": false,
+            "console": "internalConsole",
+            "preLaunchTask": "build:debug"
+        },
+        {
+            "name": ".NET Debug Benchmarks",
+            "type": "coreclr",
+            "request": "launch",
+            "program": "${workspaceFolder}/artifacts/bin/EcsEngine.Benchmarks/release/EcsEngine.Benchmarks.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "stopAtEntry": false,
+            "console": "internalConsole",
+            "preLaunchTask": "build:benchmarks"
+        },
+        {
+            "name": ".NET Attach to Process",
+            "type": "coreclr",
+            "request": "attach",
+            "processId": "${command:pickProcess}"
+        }
+    ]
+}

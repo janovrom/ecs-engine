@@ -96,6 +96,53 @@ public class SystemSchedulerTests
         Assert.That(names, Is.EqualTo(new[] { nameof(IndepAlpha), nameof(IndepBeta), nameof(IndepGamma) }));
     }
 
+    [Test]
+    public void Build_ExportsDependencyEdges_ForAfterAndBeforeConstraints()
+    {
+        SystemExecutor executor = new SystemScheduler()
+            .Register(new SystemB())
+            .Register(new SystemA())
+            .Register(new SystemC())
+            .Register(new SystemD())
+            .Build();
+
+        string[] edgeNames = executor.DependencyEdges
+            .Select(e => $"{e.From.Name}->{e.To.Name}")
+            .ToArray();
+
+        Assert.That(edgeNames, Is.EqualTo(new[]
+        {
+            $"{nameof(SystemA)}->{nameof(SystemB)}",
+            $"{nameof(SystemC)}->{nameof(SystemD)}",
+        }));
+    }
+
+    [Test]
+    public void ExportDependencyGraphDot_IsDeterministicAndContainsExpectedEdges()
+    {
+        SystemExecutor executor = new SystemScheduler()
+            .Register(new SystemD())
+            .Register(new SystemB())
+            .Register(new SystemA())
+            .Register(new SystemC())
+            .Build();
+
+        string dot = executor.ExportDependencyGraphDot();
+
+        Assert.That(dot, Does.StartWith("digraph SystemSchedule {"));
+        Assert.That(dot, Does.Contain($"\"{typeof(SystemA).FullName}\" -> \"{typeof(SystemB).FullName}\";"));
+        Assert.That(dot, Does.Contain($"\"{typeof(SystemC).FullName}\" -> \"{typeof(SystemD).FullName}\";"));
+
+        int indexA = dot.IndexOf(typeof(SystemA).FullName!, StringComparison.Ordinal);
+        int indexB = dot.IndexOf(typeof(SystemB).FullName!, StringComparison.Ordinal);
+        int indexC = dot.IndexOf(typeof(SystemC).FullName!, StringComparison.Ordinal);
+        int indexD = dot.IndexOf(typeof(SystemD).FullName!, StringComparison.Ordinal);
+
+        Assert.That(indexA, Is.LessThan(indexB));
+        Assert.That(indexB, Is.LessThan(indexC));
+        Assert.That(indexC, Is.LessThan(indexD));
+    }
+
     // --- Cycle detection ---
 
     [Test]
@@ -163,6 +210,41 @@ public class SystemSchedulerTests
             nameof(SystemA), nameof(SystemB),
             nameof(SystemA), nameof(SystemB)
         }));
+    }
+
+    [Test]
+    public void Run_WithObserver_EmitsTickAndSystemMetrics()
+    {
+        EcsWorld world = new();
+        SystemExecutor executor = new SystemScheduler()
+            .Register(new SystemA())
+            .Register(new SystemB())
+            .Build();
+        TestObserver observer = new();
+
+        executor.Run(world, observer);
+
+        Assert.That(observer.TickStartedCount, Is.EqualTo(1));
+        Assert.That(observer.TickCompletedCount, Is.EqualTo(1));
+        Assert.That(observer.SystemExecutions, Is.EqualTo(2));
+        Assert.That(observer.LastTick, Is.EqualTo(world.Tick));
+    }
+
+    [Test]
+    public void Run_WhenObserverSkipsSampling_DoesNotEmitMetrics()
+    {
+        EcsWorld world = new();
+        SystemExecutor executor = new SystemScheduler()
+            .Register(new SystemA())
+            .Register(new SystemB())
+            .Build();
+        TestObserver observer = new() { Sample = false };
+
+        executor.Run(world, observer);
+
+        Assert.That(observer.TickStartedCount, Is.EqualTo(0));
+        Assert.That(observer.TickCompletedCount, Is.EqualTo(0));
+        Assert.That(observer.SystemExecutions, Is.EqualTo(0));
     }
 
     // -------------------------------------------------------------------------
@@ -280,5 +362,49 @@ public class SystemSchedulerTests
     {
         public static void Configure(ISystemBuilder b) => b.After<SingleSystem>();
         public void Execute(EcsWorld world) { }
+    }
+
+    private sealed class TestObserver : ISystemExecutionObserver
+    {
+        public bool IsEnabled { get; set; } = true;
+        public bool Sample { get; set; } = true;
+        public int LastTick { get; private set; }
+        public int TickStartedCount { get; private set; }
+        public int TickCompletedCount { get; private set; }
+        public int SystemExecutions { get; private set; }
+
+        public bool ShouldSampleTick(int tick) => Sample;
+
+        public void OnTickStarted(
+            int tick,
+            int systemCount,
+            int batchCount,
+            int maxBatchSize,
+            double batchingEfficiency)
+        {
+            LastTick = tick;
+            TickStartedCount++;
+            Assert.That(systemCount, Is.GreaterThanOrEqualTo(0));
+            Assert.That(batchCount, Is.GreaterThanOrEqualTo(0));
+            Assert.That(maxBatchSize, Is.GreaterThanOrEqualTo(0));
+            Assert.That(batchingEfficiency, Is.InRange(0d, 1d));
+        }
+
+        public void OnSystemExecuted(int tick, Type systemType, long elapsedTicks, long allocatedBytes)
+        {
+            LastTick = tick;
+            SystemExecutions++;
+            Assert.That(systemType, Is.Not.Null);
+            Assert.That(elapsedTicks, Is.GreaterThanOrEqualTo(0));
+            Assert.That(allocatedBytes, Is.GreaterThanOrEqualTo(0));
+        }
+
+        public void OnTickCompleted(int tick, long elapsedTicks, long allocatedBytes)
+        {
+            LastTick = tick;
+            TickCompletedCount++;
+            Assert.That(elapsedTicks, Is.GreaterThanOrEqualTo(0));
+            Assert.That(allocatedBytes, Is.GreaterThanOrEqualTo(0));
+        }
     }
 }

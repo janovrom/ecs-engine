@@ -6,4 +6,6 @@ namespace EcsEngine.Runtime;
 public sealed class RuntimeConfig
 {
     public StartupMode StartupMode { get; init; } = StartupMode.Local;
+
+    public RuntimeObservabilityConfig Observability { get; init; } = new();
 }
