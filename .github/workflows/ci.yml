@@ -57,3 +57,31 @@ jobs:
 
       - name: Publish AOT (windows-x64)
         run: dotnet publish src/EcsEngine.Runtime/EcsEngine.Runtime.csproj -c Release -r win-x64 -p:PublishAot=true -o ./artifacts/aot/windows-x64
+
+  aot-trim-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Publish AOT with Strict Trim (linux-x64)
+        run: dotnet publish src/EcsEngine.Runtime/EcsEngine.Runtime.csproj -c Release -r linux-x64 -p:PublishAot=true -p:PublishTrimmed=true -p:TrimMode=link -o ./artifacts/aot-trim/linux-x64
+
+  aot-trim-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Publish AOT with Strict Trim (windows-x64)
+        run: dotnet publish src/EcsEngine.Runtime/EcsEngine.Runtime.csproj -c Release -r win-x64 -p:PublishAot=true -p:PublishTrimmed=true -p:TrimMode=link -o ./artifacts/aot-trim/windows-x64
